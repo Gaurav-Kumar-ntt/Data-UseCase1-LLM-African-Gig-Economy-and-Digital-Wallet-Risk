@@ -1,0 +1,33 @@
+# Python dependencies for this project.
+# Generated 2026-08-14 from the versions actually used to run the pipeline and analysis
+# in this repo (/opt/anaconda3 environment) — nothing here was newly installed; these
+# were already present. Install with: pip install -r requirements.txt
+
+# --- Code/Data model.ipynb (Spark join: fact_transactions <-> 4 dims) ---
+pyspark==4.2.0
+jupyter==1.0.0
+
+# --- Statistical analysis / EDA (pandas-based scripts used to compute all figures
+#     shown in the visualization) ---
+pandas==2.1.4
+numpy==1.26.4
+
+# --- Optional: only needed to regenerate PNG/JPEG exports of the visualization
+#     (crops screenshots during QA) ---
+Pillow==10.2.0
+
+# =============================================================================
+# Non-Python tools this repo also relies on (not pip-installable — install
+# separately). Versions below are what was verified working; not hard pins.
+# =============================================================================
+#   Java (OpenJDK 17+)  — required by pyspark to run Code/Data model.ipynb.
+#                          Verified with OpenJDK 24.0.2 (`brew install openjdk`).
+#   Node.js (18+)        — runs the dataviz skill's palette validator
+#                          (scripts/validate_palette.js) and JS syntax checks.
+#                          Verified with v26.7.0.
+#   jq                   — validates hook/settings JSON. Verified with jq 1.7.1.
+#   Google Chrome        — headless-rendered for visualization QA screenshots
+#                          and to generate the PNG/JPEG exports in
+#                          output/visualizations/. Any recent version works.
+#   macOS `say`          — terminal voice greeting (.claude/hooks/session_greeting.sh).
+#                          Built into macOS; this hook is a no-op on Linux/Windows.

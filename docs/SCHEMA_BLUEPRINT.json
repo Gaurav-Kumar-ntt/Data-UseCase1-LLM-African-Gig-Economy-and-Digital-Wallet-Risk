@@ -1,0 +1,1272 @@
+{
+  "schema_version": "1.0",
+  "metadata": {
+    "theme": "African Gig-Economy and Digital Wallet Risk",
+    "business": "PayPesa",
+    "complexity": "intermediate",
+    "total_rows": 50000,
+    "description": "Star schema for digital wallet transaction risk analytics"
+  },
+  "global_parameters": {
+    "date_range_start": "2023-01-01",
+    "date_range_end": "2024-12-31",
+    "base_currency": "USD",
+    "locale": "en_US",
+    "random_seed": null
+  },
+  "tables": {
+    "fact_transactions": {
+      "name": "fact_transactions",
+      "table_type": "fact",
+      "grain": "one row per wallet transaction",
+      "row_count": 50000,
+      "primary_key": "transaction_id",
+      "columns": {
+        "transaction_id": {
+          "name": "transaction_id",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "Unique transaction identifier",
+          "generator": "uuid",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "worker_id": {
+          "name": "worker_id",
+          "data_type": "integer",
+          "nullable": false,
+          "unique": false,
+          "description": "Gig worker FK",
+          "generator": "foreign_key",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "date_id": {
+          "name": "date_id",
+          "data_type": "integer",
+          "nullable": false,
+          "unique": false,
+          "description": "Date dimension FK",
+          "generator": "foreign_key",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "channel_id": {
+          "name": "channel_id",
+          "data_type": "integer",
+          "nullable": false,
+          "unique": false,
+          "description": "Channel dimension FK",
+          "generator": "foreign_key",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "market_id": {
+          "name": "market_id",
+          "data_type": "integer",
+          "nullable": false,
+          "unique": false,
+          "description": "Market dimension FK",
+          "generator": "foreign_key",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "transaction_type": {
+          "name": "transaction_type",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "Cash-in out transfer payment",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              "cash_in",
+              "cash_out",
+              "peer_transfer",
+              "merchant_payment",
+              "bill_payment"
+            ],
+            "weights": [
+              0.22,
+              0.2,
+              0.25,
+              0.2,
+              0.13
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "amount_local": {
+          "name": "amount_local",
+          "data_type": "float",
+          "nullable": false,
+          "unique": false,
+          "description": "Transaction amount local currency",
+          "generator": "numpy",
+          "generator_params": {
+            "distribution": "lognormal",
+            "mean": 5.2,
+            "sigma": 1.4
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "amount_usd": {
+          "name": "amount_usd",
+          "data_type": "float",
+          "nullable": false,
+          "unique": false,
+          "description": "Amount in USD",
+          "generator": "numpy",
+          "generator_params": {
+            "distribution": "lognormal",
+            "mean": 3.8,
+            "sigma": 1.4
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "transaction_outcome": {
+          "name": "transaction_outcome",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "Success failed reversed pending",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              "success",
+              "failed",
+              "reversed",
+              "pending"
+            ],
+            "weights": [
+              0.78,
+              0.1,
+              0.08,
+              0.04
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "is_fraud_flagged": {
+          "name": "is_fraud_flagged",
+          "data_type": "boolean",
+          "nullable": false,
+          "unique": false,
+          "description": "Fraud flag indicator",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              true,
+              false
+            ],
+            "weights": [
+              0.07,
+              0.93
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "is_disputed": {
+          "name": "is_disputed",
+          "data_type": "boolean",
+          "nullable": false,
+          "unique": false,
+          "description": "Dispute raised flag",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              true,
+              false
+            ],
+            "weights": [
+              0.05,
+              0.95
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "is_reversed": {
+          "name": "is_reversed",
+          "data_type": "boolean",
+          "nullable": false,
+          "unique": false,
+          "description": "Transaction reversed flag",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              true,
+              false
+            ],
+            "weights": [
+              0.08,
+              0.92
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "velocity_score": {
+          "name": "velocity_score",
+          "data_type": "float",
+          "nullable": true,
+          "unique": false,
+          "description": "Transactions per hour score",
+          "generator": "numpy",
+          "generator_params": {
+            "distribution": "uniform",
+            "low": 0.0,
+            "high": 10.0
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "fraud_loss_usd": {
+          "name": "fraud_loss_usd",
+          "data_type": "float",
+          "nullable": true,
+          "unique": false,
+          "description": "Loss amount if fraud",
+          "generator": "numpy",
+          "generator_params": {
+            "distribution": "lognormal",
+            "mean": 2.5,
+            "sigma": 1.2
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "processing_time_ms": {
+          "name": "processing_time_ms",
+          "data_type": "integer",
+          "nullable": true,
+          "unique": false,
+          "description": "Processing latency milliseconds",
+          "generator": "numpy",
+          "generator_params": {
+            "distribution": "normal",
+            "mean": 850,
+            "sigma": 300
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        }
+      },
+      "static_data": false,
+      "seed_data": null,
+      "auto_generate": false,
+      "auto_generate_params": {}
+    },
+    "dim_worker": {
+      "name": "dim_worker",
+      "table_type": "dimension",
+      "grain": "",
+      "row_count": 5000,
+      "primary_key": "worker_id",
+      "columns": {
+        "worker_id": {
+          "name": "worker_id",
+          "data_type": "integer",
+          "nullable": false,
+          "unique": false,
+          "description": "Unique worker identifier",
+          "generator": "sequence",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "worker_name": {
+          "name": "worker_name",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "Full name",
+          "generator": "faker",
+          "generator_params": {
+            "method": "name"
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "gig_segment": {
+          "name": "gig_segment",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "Worker gig category",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              "ride_hailing_driver",
+              "delivery_rider",
+              "freelance_creative",
+              "market_trader"
+            ],
+            "weights": [
+              0.3,
+              0.28,
+              0.2,
+              0.22
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "account_tenure_days": {
+          "name": "account_tenure_days",
+          "data_type": "integer",
+          "nullable": false,
+          "unique": false,
+          "description": "Days since account opened",
+          "generator": "numpy",
+          "generator_params": {
+            "distribution": "exponential",
+            "scale": 300
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "kyc_tier": {
+          "name": "kyc_tier",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "KYC verification level",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              "tier_1",
+              "tier_2",
+              "tier_3"
+            ],
+            "weights": [
+              0.45,
+              0.35,
+              0.2
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "gender": {
+          "name": "gender",
+          "data_type": "string",
+          "nullable": true,
+          "unique": false,
+          "description": "Worker gender",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              "Male",
+              "Female",
+              "Prefer not to say"
+            ],
+            "weights": [
+              0.62,
+              0.34,
+              0.04
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "age_band": {
+          "name": "age_band",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "Age group band",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              "18-24",
+              "25-34",
+              "35-44",
+              "45-54",
+              "55+"
+            ],
+            "weights": [
+              0.18,
+              0.38,
+              0.27,
+              0.12,
+              0.05
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "risk_score": {
+          "name": "risk_score",
+          "data_type": "float",
+          "nullable": false,
+          "unique": false,
+          "description": "Account risk score 0-100",
+          "generator": "numpy",
+          "generator_params": {
+            "distribution": "beta",
+            "a": 2,
+            "b": 5
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "is_active": {
+          "name": "is_active",
+          "data_type": "boolean",
+          "nullable": false,
+          "unique": false,
+          "description": "Active account flag",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              true,
+              false
+            ],
+            "weights": [
+              0.88,
+              0.12
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "preferred_channel": {
+          "name": "preferred_channel",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "Primary channel used",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              "app",
+              "ussd",
+              "agent"
+            ],
+            "weights": [
+              0.48,
+              0.32,
+              0.2
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        }
+      },
+      "static_data": false,
+      "seed_data": null,
+      "auto_generate": false,
+      "auto_generate_params": {}
+    },
+    "dim_channel": {
+      "name": "dim_channel",
+      "table_type": "dimension",
+      "grain": "",
+      "row_count": 12,
+      "primary_key": "channel_id",
+      "columns": {
+        "channel_id": {
+          "name": "channel_id",
+          "data_type": "integer",
+          "nullable": false,
+          "unique": false,
+          "description": "Unique channel identifier",
+          "generator": "sequence",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "channel_type": {
+          "name": "channel_type",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "USSD app agent card",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              "app",
+              "ussd",
+              "agent",
+              "card",
+              "bank_transfer"
+            ],
+            "weights": [
+              0.38,
+              0.28,
+              0.18,
+              0.1,
+              0.06
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "channel_subtype": {
+          "name": "channel_subtype",
+          "data_type": "string",
+          "nullable": true,
+          "unique": false,
+          "description": "Channel subcategory detail",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              "android_app",
+              "ios_app",
+              "web_app",
+              "ussd_shortcode",
+              "agent_network",
+              "card_pos",
+              "card_online",
+              "bank_api"
+            ],
+            "weights": [
+              0.22,
+              0.1,
+              0.06,
+              0.28,
+              0.18,
+              0.06,
+              0.04,
+              0.06
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "is_digital": {
+          "name": "is_digital",
+          "data_type": "boolean",
+          "nullable": false,
+          "unique": false,
+          "description": "Digital vs physical channel",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              true,
+              false
+            ],
+            "weights": [
+              0.76,
+              0.24
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "avg_fraud_rate": {
+          "name": "avg_fraud_rate",
+          "data_type": "float",
+          "nullable": false,
+          "unique": false,
+          "description": "Historical fraud rate",
+          "generator": "numpy",
+          "generator_params": {
+            "distribution": "uniform",
+            "low": 0.02,
+            "high": 0.15
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "requires_internet": {
+          "name": "requires_internet",
+          "data_type": "boolean",
+          "nullable": false,
+          "unique": false,
+          "description": "Needs internet connection",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              true,
+              false
+            ],
+            "weights": [
+              0.54,
+              0.46
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        }
+      },
+      "static_data": false,
+      "seed_data": null,
+      "auto_generate": false,
+      "auto_generate_params": {}
+    },
+    "dim_market": {
+      "name": "dim_market",
+      "table_type": "dimension",
+      "grain": "",
+      "row_count": 4,
+      "primary_key": "market_id",
+      "columns": {
+        "market_id": {
+          "name": "market_id",
+          "data_type": "integer",
+          "nullable": false,
+          "unique": false,
+          "description": "Unique market identifier",
+          "generator": "sequence",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "country": {
+          "name": "country",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "Country name",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              "Nigeria",
+              "Kenya",
+              "Ghana",
+              "South Africa"
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "iso_code": {
+          "name": "iso_code",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "ISO country code",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              "NG",
+              "KE",
+              "GH",
+              "ZA"
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "local_currency": {
+          "name": "local_currency",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "Local currency code",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              "NGN",
+              "KES",
+              "GHS",
+              "ZAR"
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "dominant_channel": {
+          "name": "dominant_channel",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "Most used payment channel",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              "agent",
+              "ussd",
+              "app",
+              "card"
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "regulatory_tier": {
+          "name": "regulatory_tier",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "Regulatory complexity tier",
+          "generator": "choice",
+          "generator_params": {
+            "values": [
+              "high",
+              "medium",
+              "medium",
+              "high"
+            ]
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "usd_fx_rate": {
+          "name": "usd_fx_rate",
+          "data_type": "float",
+          "nullable": false,
+          "unique": false,
+          "description": "USD exchange rate",
+          "generator": "numpy",
+          "generator_params": {
+            "distribution": "uniform",
+            "low": 1.0,
+            "high": 1600.0
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "market_fraud_index": {
+          "name": "market_fraud_index",
+          "data_type": "float",
+          "nullable": false,
+          "unique": false,
+          "description": "Relative fraud exposure index",
+          "generator": "numpy",
+          "generator_params": {
+            "distribution": "uniform",
+            "low": 0.5,
+            "high": 2.0
+          },
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        }
+      },
+      "static_data": false,
+      "seed_data": null,
+      "auto_generate": false,
+      "auto_generate_params": {}
+    },
+    "dim_date": {
+      "name": "dim_date",
+      "table_type": "dimension",
+      "grain": "",
+      "row_count": 730,
+      "primary_key": "date_id",
+      "columns": {
+        "date_id": {
+          "name": "date_id",
+          "data_type": "integer",
+          "nullable": false,
+          "unique": false,
+          "description": "Surrogate date key",
+          "generator": "sequence",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "full_date": {
+          "name": "full_date",
+          "data_type": "date",
+          "nullable": false,
+          "unique": false,
+          "description": "Calendar date",
+          "generator": "date_range",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "year": {
+          "name": "year",
+          "data_type": "integer",
+          "nullable": false,
+          "unique": false,
+          "description": "Calendar year",
+          "generator": "derived",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "month": {
+          "name": "month",
+          "data_type": "integer",
+          "nullable": false,
+          "unique": false,
+          "description": "Month number 1-12",
+          "generator": "derived",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "quarter": {
+          "name": "quarter",
+          "data_type": "integer",
+          "nullable": false,
+          "unique": false,
+          "description": "Quarter number 1-4",
+          "generator": "derived",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "day_of_week": {
+          "name": "day_of_week",
+          "data_type": "string",
+          "nullable": false,
+          "unique": false,
+          "description": "Day name",
+          "generator": "derived",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "is_weekend": {
+          "name": "is_weekend",
+          "data_type": "boolean",
+          "nullable": false,
+          "unique": false,
+          "description": "Weekend flag",
+          "generator": "derived",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "is_month_end": {
+          "name": "is_month_end",
+          "data_type": "boolean",
+          "nullable": false,
+          "unique": false,
+          "description": "Month end flag",
+          "generator": "derived",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        },
+        "week_number": {
+          "name": "week_number",
+          "data_type": "integer",
+          "nullable": false,
+          "unique": false,
+          "description": "ISO week number",
+          "generator": "derived",
+          "generator_params": {},
+          "format_pattern": null,
+          "values": null,
+          "weights": null,
+          "min_value": null,
+          "max_value": null,
+          "precision": null,
+          "formula": null,
+          "null_rate": 0.0
+        }
+      },
+      "static_data": false,
+      "seed_data": null,
+      "auto_generate": false,
+      "auto_generate_params": {}
+    }
+  },
+  "relationships": [
+    {
+      "relationship_id": "",
+      "from_table": "fact_transactions",
+      "from_column": "worker_id",
+      "to_table": "dim_worker",
+      "to_column": "worker_id",
+      "relationship_type": "many_to_one",
+      "enforced": true
+    },
+    {
+      "relationship_id": "",
+      "from_table": "fact_transactions",
+      "from_column": "date_id",
+      "to_table": "dim_date",
+      "to_column": "date_id",
+      "relationship_type": "many_to_one",
+      "enforced": true
+    },
+    {
+      "relationship_id": "",
+      "from_table": "fact_transactions",
+      "from_column": "channel_id",
+      "to_table": "dim_channel",
+      "to_column": "channel_id",
+      "relationship_type": "many_to_one",
+      "enforced": true
+    },
+    {
+      "relationship_id": "",
+      "from_table": "fact_transactions",
+      "from_column": "market_id",
+      "to_table": "dim_market",
+      "to_column": "market_id",
+      "relationship_type": "many_to_one",
+      "enforced": true
+    }
+  ],
+  "narrative_anchors": [
+    {
+      "anchor_id": "NA001",
+      "description": "USSD channel shows 2.3x higher fraud rate than app channel",
+      "target_tables": [],
+      "target_columns": [],
+      "statistical_rule": {},
+      "validation_query": null,
+      "tolerance": 0.05
+    },
+    {
+      "anchor_id": "NA002",
+      "description": "Nigeria and Kenya drive 70% of fraud volume",
+      "target_tables": [],
+      "target_columns": [],
+      "statistical_rule": {},
+      "validation_query": null,
+      "tolerance": 0.05
+    },
+    {
+      "anchor_id": "NA003",
+      "description": "New accounts under 90 days show 3x higher fraud rate",
+      "target_tables": [],
+      "target_columns": [],
+      "statistical_rule": {},
+      "validation_query": null,
+      "tolerance": 0.05
+    },
+    {
+      "anchor_id": "NA004",
+      "description": "Market traders have highest dispute rate among gig segments",
+      "target_tables": [],
+      "target_columns": [],
+      "statistical_rule": {},
+      "validation_query": null,
+      "tolerance": 0.05
+    },
+    {
+      "anchor_id": "NA005",
+      "description": "High velocity score correlates with fraud and reversal",
+      "target_tables": [],
+      "target_columns": [],
+      "statistical_rule": {},
+      "validation_query": null,
+      "tolerance": 0.05
+    },
+    {
+      "anchor_id": "NA006",
+      "description": "Month-end spikes in cash-out and reversal rates",
+      "target_tables": [],
+      "target_columns": [],
+      "statistical_rule": {},
+      "validation_query": null,
+      "tolerance": 0.05
+    }
+  ],
+  "dirty_data_config": {
+    "enabled": true,
+    "difficulty_level": "intermediate",
+    "seed": null,
+    "rules": []
+  },
+  "validation_config": {
+    "referential_integrity_enabled": true,
+    "strict_mode": true,
+    "arithmetic_audits": []
+  },
+  "export_config": {
+    "file_formats": [
+      "csv"
+    ],
+    "csv_delimiter": ",",
+    "csv_encoding": "utf-8",
+    "parquet_compression": "snappy",
+    "generate_data_dictionary": true,
+    "generate_challenge_brief": true,
+    "generate_erd": false,
+    "package_format": "zip"
+  }
+}

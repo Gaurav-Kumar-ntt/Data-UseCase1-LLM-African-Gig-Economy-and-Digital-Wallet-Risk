@@ -1,0 +1,1543 @@
+{
+  "schema_version": "1.0",
+  "theme": "African Gig-Economy and Digital Wallet Risk",
+  "allowed_value_sets": {
+    "dim_market_country": {
+      "column_name": "dim_market_country",
+      "table_name": "dim",
+      "values": [
+        "Nigeria",
+        "Kenya",
+        "Ghana",
+        "South Africa"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Four active PayPesa markets. Each market has distinct channel mix and regulatory regime.",
+        "notes": "Nigeria: bank-transfer dominant; Kenya: mobile-money agent dominant; Ghana: mixed; South Africa: card and bank-transfer dominant"
+      }
+    },
+    "dim_market_region": {
+      "column_name": "dim_market_region",
+      "table_name": "dim",
+      "values": [
+        "Lagos",
+        "Abuja",
+        "Kano",
+        "Port Harcourt",
+        "Nairobi",
+        "Mombasa",
+        "Kisumu",
+        "Nakuru",
+        "Accra",
+        "Kumasi",
+        "Tamale",
+        "Johannesburg",
+        "Cape Town",
+        "Durban",
+        "Pretoria"
+      ],
+      "hierarchy": {
+        "Nigeria": [
+          "Lagos",
+          "Abuja",
+          "Kano",
+          "Port Harcourt"
+        ],
+        "Kenya": [
+          "Nairobi",
+          "Mombasa",
+          "Kisumu",
+          "Nakuru"
+        ],
+        "Ghana": [
+          "Accra",
+          "Kumasi",
+          "Tamale"
+        ],
+        "South Africa": [
+          "Johannesburg",
+          "Cape Town",
+          "Durban",
+          "Pretoria"
+        ]
+      },
+      "metadata": {
+        "description": "Sub-national regions within each market. Used for corridor-level fraud heatmaps."
+      }
+    },
+    "dim_market_currency": {
+      "column_name": "dim_market_currency",
+      "table_name": "dim",
+      "values": [
+        "NGN",
+        "KES",
+        "GHS",
+        "ZAR"
+      ],
+      "hierarchy": {
+        "Nigeria": [
+          "NGN"
+        ],
+        "Kenya": [
+          "KES"
+        ],
+        "Ghana": [
+          "GHS"
+        ],
+        "South Africa": [
+          "ZAR"
+        ]
+      },
+      "metadata": {
+        "description": "Local settlement currency per market. Cross-market transfers require FX corridor mapping."
+      }
+    },
+    "dim_market_regulatory_tier": {
+      "column_name": "dim_market_regulatory_tier",
+      "table_name": "dim",
+      "values": [
+        "Tier_1",
+        "Tier_2",
+        "Tier_3"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "KYC compliance tier enforced by local regulator. Tier_1 = basic phone-verified; Tier_2 = ID-verified; Tier_3 = full KYC with biometric. Affects transaction limits and fraud risk exposure."
+      }
+    },
+    "dim_channel_channel_type": {
+      "column_name": "dim_channel_channel_type",
+      "table_name": "dim",
+      "values": [
+        "App",
+        "USSD",
+        "Agent",
+        "Web",
+        "API"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Primary interface through which the transaction was initiated. USSD and Agent are higher fraud-risk channels due to reduced device fingerprinting. App enables full device-signal capture.",
+        "risk_ranking": "Agent > USSD > Web > API > App"
+      }
+    },
+    "dim_channel_channel_subtype": {
+      "column_name": "dim_channel_channel_subtype",
+      "table_name": "dim",
+      "values": [
+        "Android_App",
+        "iOS_App",
+        "USSD_Self_Service",
+        "USSD_Agent_Assisted",
+        "Agent_Mobile_Money",
+        "Agent_POS",
+        "Agent_Kiosk",
+        "Web_Browser",
+        "Web_PWA",
+        "API_Partner",
+        "API_B2B"
+      ],
+      "hierarchy": {
+        "App": [
+          "Android_App",
+          "iOS_App"
+        ],
+        "USSD": [
+          "USSD_Self_Service",
+          "USSD_Agent_Assisted"
+        ],
+        "Agent": [
+          "Agent_Mobile_Money",
+          "Agent_POS",
+          "Agent_Kiosk"
+        ],
+        "Web": [
+          "Web_Browser",
+          "Web_PWA"
+        ],
+        "API": [
+          "API_Partner",
+          "API_B2B"
+        ]
+      },
+      "metadata": {
+        "description": "Granular channel subtype for risk segmentation. Agent_Mobile_Money is dominant in Kenya. USSD_Agent_Assisted carries highest reversal rate due to input errors."
+      }
+    },
+    "dim_channel_device_os": {
+      "column_name": "dim_channel_device_os",
+      "table_name": "dim",
+      "values": [
+        "Android",
+        "iOS",
+        "KaiOS",
+        "Undetected",
+        "N/A"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Operating system of transaction-initiating device. KaiOS associated with feature-phone USSD/App hybrid. N/A applies to Agent and API channels. Undetected is a fraud-signal flag."
+      }
+    },
+    "dim_channel_network_type": {
+      "column_name": "dim_channel_network_type",
+      "table_name": "dim",
+      "values": [
+        "2G",
+        "3G",
+        "4G",
+        "5G",
+        "WiFi",
+        "Offline_Sync",
+        "Unknown"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Network connectivity at transaction time. Offline_Sync applies to agent POS batch settlements. Unknown is a risk signal for app transactions."
+      }
+    },
+    "dim_worker_worker_type": {
+      "column_name": "dim_worker_worker_type",
+      "table_name": "dim",
+      "values": [
+        "Ride_Hailing_Driver",
+        "Delivery_Rider",
+        "Freelance_Creative",
+        "Market_Trader",
+        "Domestic_Worker",
+        "Construction_Worker",
+        "Street_Vendor"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Gig-economy worker segment. Ride_Hailing_Driver and Delivery_Rider tend to have higher transaction velocity. Market_Trader and Street_Vendor more likely to use USSD or Agent channels.",
+        "risk_notes": "Freelance_Creative has highest dispute rate due to service-delivery ambiguity in peer transfers."
+      }
+    },
+    "dim_worker_gender": {
+      "column_name": "dim_worker_gender",
+      "table_name": "dim",
+      "values": [
+        "Male",
+        "Female",
+        "Non_Binary",
+        "Not_Disclosed"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Self-reported gender. Used for equity analysis in intervention targeting to avoid disproportionate friction on female workers."
+      }
+    },
+    "dim_worker_account_status": {
+      "column_name": "dim_worker_account_status",
+      "table_name": "dim",
+      "values": [
+        "Active",
+        "Suspended",
+        "Dormant",
+        "Closed",
+        "Under_Review"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Current account lifecycle state. Suspended and Under_Review accounts may still have in-flight transactions that require resolution. Dormant accounts with sudden high-value activity are a fraud signal."
+      }
+    },
+    "dim_worker_kyc_level": {
+      "column_name": "dim_worker_kyc_level",
+      "table_name": "dim",
+      "values": [
+        "Phone_Verified",
+        "ID_Verified",
+        "Biometric_Verified",
+        "Enhanced_Due_Diligence"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "KYC completion level. Maps loosely to regulatory tier. Enhanced_Due_Diligence required for workers with monthly volumes exceeding market-specific thresholds."
+      }
+    },
+    "dim_worker_risk_band": {
+      "column_name": "dim_worker_risk_band",
+      "table_name": "dim",
+      "values": [
+        "Low",
+        "Medium",
+        "High",
+        "Critical"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Internal risk score band assigned by the risk engine. Updated nightly. Critical band workers are subject to transaction holds pending manual review."
+      }
+    },
+    "fact_transactions_transaction_type": {
+      "column_name": "fact_transactions_transaction_type",
+      "table_name": "fact",
+      "values": [
+        "Cash_In",
+        "Cash_Out",
+        "Peer_Transfer",
+        "Merchant_Payment",
+        "Bill_Payment",
+        "Wallet_Top_Up",
+        "Refund"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Economic purpose of the transaction. Cash_Out and Peer_Transfer carry highest fraud exposure. Bill_Payment is lowest fraud risk. Refund transactions should be reconciled against originating transaction.",
+        "reversal_risk_ranking": "Cash_Out > Peer_Transfer > Cash_In > Merchant_Payment > Bill_Payment > Wallet_Top_Up > Refund"
+      }
+    },
+    "fact_transactions_transaction_status": {
+      "column_name": "fact_transactions_transaction_status",
+      "table_name": "fact",
+      "values": [
+        "Completed",
+        "Failed",
+        "Pending",
+        "Reversed",
+        "Disputed",
+        "Blocked",
+        "Expired"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Terminal or in-flight status of the transaction. Reversed and Disputed are primary loss indicators. Blocked transactions were stopped by real-time fraud rules. Expired applies to USSD sessions that timed out.",
+        "loss_relevant": [
+          "Reversed",
+          "Disputed",
+          "Failed"
+        ]
+      }
+    },
+    "fact_transactions_fraud_flag": {
+      "column_name": "fact_transactions_fraud_flag",
+      "table_name": "fact",
+      "values": [
+        "Confirmed_Fraud",
+        "Suspected_Fraud",
+        "Cleared",
+        "Not_Reviewed"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Fraud classification outcome. Confirmed_Fraud means investigated and confirmed. Suspected_Fraud is rule-triggered but pending review. Cleared means investigated and found legitimate. Not_Reviewed means below review threshold."
+      }
+    },
+    "fact_transactions_dispute_reason": {
+      "column_name": "fact_transactions_dispute_reason",
+      "table_name": "fact",
+      "values": [
+        "Unauthorized_Transaction",
+        "Duplicate_Transaction",
+        "Service_Not_Received",
+        "Wrong_Amount",
+        "Wrong_Recipient",
+        "Network_Failure_Debit",
+        "Agent_Error",
+        "Account_Compromise",
+        "Other"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Worker-reported reason for raising a dispute. Agent_Error is disproportionately high in Kenya agent network. Account_Compromise and Unauthorized_Transaction are direct fraud indicators.",
+        "fraud_correlated": [
+          "Unauthorized_Transaction",
+          "Account_Compromise",
+          "Duplicate_Transaction"
+        ]
+      }
+    },
+    "fact_transactions_corridor": {
+      "column_name": "fact_transactions_corridor",
+      "table_name": "fact",
+      "values": [
+        "Nigeria_Domestic",
+        "Kenya_Domestic",
+        "Ghana_Domestic",
+        "South_Africa_Domestic",
+        "Nigeria_Kenya",
+        "Nigeria_Ghana",
+        "Nigeria_South_Africa",
+        "Kenya_Ghana",
+        "Kenya_South_Africa",
+        "Ghana_South_Africa",
+        "Kenya_Nigeria",
+        "Ghana_Nigeria",
+        "South_Africa_Nigeria",
+        "Ghana_Kenya",
+        "South_Africa_Kenya",
+        "South_Africa_Ghana"
+      ],
+      "hierarchy": {
+        "Domestic": [
+          "Nigeria_Domestic",
+          "Kenya_Domestic",
+          "Ghana_Domestic",
+          "South_Africa_Domestic"
+        ],
+        "Cross_Border": [
+          "Nigeria_Kenya",
+          "Nigeria_Ghana",
+          "Nigeria_South_Africa",
+          "Kenya_Ghana",
+          "Kenya_South_Africa",
+          "Ghana_South_Africa",
+          "Kenya_Nigeria",
+          "Ghana_Nigeria",
+          "South_Africa_Nigeria",
+          "Ghana_Kenya",
+          "South_Africa_Kenya",
+          "South_Africa_Ghana"
+        ]
+      },
+      "metadata": {
+        "description": "Source-to-destination market corridor. Format is OriginMarket_DestinationMarket. Cross-border corridors have higher fraud rates and require FX settlement. Nigeria_Kenya is highest-volume cross-border corridor.",
+        "high_risk_corridors": [
+          "Nigeria_South_Africa",
+          "Ghana_Nigeria",
+          "Kenya_South_Africa"
+        ]
+      }
+    },
+    "dim_date_day_of_week": {
+      "column_name": "dim_date_day_of_week",
+      "table_name": "dim",
+      "values": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Day of week for temporal fraud pattern analysis. Fraud spike typically observed Friday\u2013Saturday evenings across all markets."
+      }
+    },
+    "dim_date_is_holiday": {
+      "column_name": "dim_date_is_holiday",
+      "table_name": "dim",
+      "values": [
+        "Yes",
+        "No"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Whether the date is a public holiday in the transaction's originating market. Holiday periods correlate with elevated Cash_Out fraud."
+      }
+    },
+    "dim_date_market_trading_session": {
+      "column_name": "dim_date_market_trading_session",
+      "table_name": "dim",
+      "values": [
+        "Pre_Market",
+        "Peak_Morning",
+        "Midday",
+        "Peak_Evening",
+        "Late_Night",
+        "Off_Hours"
+      ],
+      "hierarchy": null,
+      "metadata": {
+        "description": "Time-of-day session bucket based on local market time. Late_Night transactions on USSD and Agent channels are a leading fraud indicator.",
+        "fraud_risk_ranking": "Late_Night > Off_Hours > Peak_Evening > Pre_Market > Midday > Peak_Morning"
+      }
+    }
+  },
+  "relationship_rules": {
+    "rel_001": {
+      "relationship_id": "rel_001",
+      "from_table": "fact_transactions",
+      "from_column": "worker_id",
+      "to_table": "dim_worker",
+      "to_column": "worker_id",
+      "cardinality": "many_to_one",
+      "required_attributes": [
+        "worker_id",
+        "worker_type",
+        "risk_band",
+        "account_status",
+        "kyc_level"
+      ]
+    },
+    "rel_002": {
+      "relationship_id": "rel_002",
+      "from_table": "fact_transactions",
+      "from_column": "channel_id",
+      "to_table": "dim_channel",
+      "to_column": "channel_id",
+      "cardinality": "many_to_one",
+      "required_attributes": [
+        "channel_id",
+        "channel_type",
+        "channel_subtype",
+        "device_os",
+        "network_type"
+      ]
+    },
+    "rel_003": {
+      "relationship_id": "rel_003",
+      "from_table": "fact_transactions",
+      "from_column": "market_id",
+      "to_table": "dim_market",
+      "to_column": "market_id",
+      "cardinality": "many_to_one",
+      "required_attributes": [
+        "market_id",
+        "country",
+        "currency",
+        "regulatory_tier",
+        "region"
+      ]
+    },
+    "rel_004": {
+      "relationship_id": "rel_004",
+      "from_table": "fact_transactions",
+      "from_column": "destination_market_id",
+      "to_table": "dim_market",
+      "to_column": "market_id",
+      "cardinality": "many_to_one",
+      "required_attributes": [
+        "market_id",
+        "country",
+        "currency"
+      ]
+    },
+    "rel_005": {
+      "relationship_id": "rel_005",
+      "from_table": "fact_transactions",
+      "from_column": "date_id",
+      "to_table": "dim_date",
+      "to_column": "date_id",
+      "cardinality": "many_to_one",
+      "required_attributes": [
+        "date_id",
+        "calendar_date",
+        "day_of_week",
+        "is_holiday",
+        "market_trading_session"
+      ]
+    },
+    "rel_006": {
+      "relationship_id": "rel_006",
+      "from_table": "fact_transactions",
+      "from_column": "originating_transaction_id",
+      "to_table": "fact_transactions",
+      "to_column": "transaction_id",
+      "cardinality": "many_to_one",
+      "required_attributes": [
+        "transaction_id",
+        "transaction_type",
+        "transaction_status",
+        "worker_id"
+      ]
+    },
+    "rel_007": {
+      "relationship_id": "rel_007",
+      "from_table": "dim_worker",
+      "from_column": "market_id",
+      "to_table": "dim_market",
+      "to_column": "market_id",
+      "cardinality": "many_to_one",
+      "required_attributes": [
+        "market_id",
+        "country",
+        "regulatory_tier"
+      ]
+    },
+    "rel_008": {
+      "relationship_id": "rel_008",
+      "from_table": "dim_worker",
+      "from_column": "preferred_channel_id",
+      "to_table": "dim_channel",
+      "to_column": "channel_id",
+      "cardinality": "many_to_one",
+      "required_attributes": [
+        "channel_id",
+        "channel_type"
+      ]
+    },
+    "rel_009": {
+      "relationship_id": "rel_009",
+      "from_table": "fact_transactions",
+      "from_column": "recipient_worker_id",
+      "to_table": "dim_worker",
+      "to_column": "worker_id",
+      "cardinality": "many_to_one",
+      "required_attributes": [
+        "worker_id",
+        "account_status",
+        "risk_band",
+        "kyc_level"
+      ]
+    }
+  },
+  "column_constraints": {
+    "fact_transactions_transaction_id": {
+      "column_name": "fact_transactions_transaction_id",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": false,
+      "unique": true,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "fact_transactions_worker_id": {
+      "column_name": "fact_transactions_worker_id",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "fact_transactions_channel_id": {
+      "column_name": "fact_transactions_channel_id",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "fact_transactions_market_id": {
+      "column_name": "fact_transactions_market_id",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "fact_transactions_destination_market_id": {
+      "column_name": "fact_transactions_destination_market_id",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": true,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "fact_transactions_date_id": {
+      "column_name": "fact_transactions_date_id",
+      "table_name": "fact",
+      "data_type": "integer",
+      "nullable": false,
+      "unique": false,
+      "min_value": 20200101,
+      "max_value": 20261231,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "fact_transactions_transaction_timestamp": {
+      "column_name": "fact_transactions_transaction_timestamp",
+      "table_name": "fact",
+      "data_type": "timestamp",
+      "nullable": false,
+      "unique": false,
+      "min_value": "2020-01-01T00:00:00Z",
+      "max_value": "2026-12-31T23:59:59Z",
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "fact_transactions_transaction_type": {
+      "column_name": "fact_transactions_transaction_type",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Cash_In",
+        "Cash_Out",
+        "Peer_Transfer",
+        "Merchant_Payment",
+        "Bill_Payment",
+        "Wallet_Top_Up",
+        "Refund"
+      ],
+      "geospatial_bounds": null
+    },
+    "fact_transactions_transaction_status": {
+      "column_name": "fact_transactions_transaction_status",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Completed",
+        "Failed",
+        "Pending",
+        "Reversed",
+        "Disputed",
+        "Blocked",
+        "Expired"
+      ],
+      "geospatial_bounds": null
+    },
+    "fact_transactions_transaction_amount_local": {
+      "column_name": "fact_transactions_transaction_amount_local",
+      "table_name": "fact",
+      "data_type": "float",
+      "nullable": false,
+      "unique": false,
+      "min_value": 0.01,
+      "max_value": 10000000.0,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "fact_transactions_transaction_amount_usd": {
+      "column_name": "fact_transactions_transaction_amount_usd",
+      "table_name": "fact",
+      "data_type": "float",
+      "nullable": false,
+      "unique": false,
+      "min_value": 0.01,
+      "max_value": 500000.0,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "fact_transactions_fraud_flag": {
+      "column_name": "fact_transactions_fraud_flag",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Confirmed_Fraud",
+        "Suspected_Fraud",
+        "Cleared",
+        "Not_Reviewed"
+      ],
+      "geospatial_bounds": null
+    },
+    "fact_transactions_dispute_flag": {
+      "column_name": "fact_transactions_dispute_flag",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Disputed",
+        "Not_Disputed"
+      ],
+      "geospatial_bounds": null
+    },
+    "fact_transactions_dispute_reason": {
+      "column_name": "fact_transactions_dispute_reason",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": true,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Unauthorized_Transaction",
+        "Duplicate_Transaction",
+        "Service_Not_Received",
+        "Wrong_Amount",
+        "Wrong_Recipient",
+        "Network_Failure_Debit",
+        "Agent_Error",
+        "Account_Compromise",
+        "Other"
+      ],
+      "geospatial_bounds": null
+    },
+    "fact_transactions_reversal_flag": {
+      "column_name": "fact_transactions_reversal_flag",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Reversed",
+        "Not_Reversed"
+      ],
+      "geospatial_bounds": null
+    },
+    "fact_transactions_corridor": {
+      "column_name": "fact_transactions_corridor",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Nigeria_Domestic",
+        "Kenya_Domestic",
+        "Ghana_Domestic",
+        "South_Africa_Domestic",
+        "Nigeria_Kenya",
+        "Nigeria_Ghana",
+        "Nigeria_South_Africa",
+        "Kenya_Ghana",
+        "Kenya_South_Africa",
+        "Ghana_South_Africa",
+        "Kenya_Nigeria",
+        "Ghana_Nigeria",
+        "South_Africa_Nigeria",
+        "Ghana_Kenya",
+        "South_Africa_Kenya",
+        "South_Africa_Ghana"
+      ],
+      "geospatial_bounds": null
+    },
+    "fact_transactions_transaction_velocity_score": {
+      "column_name": "fact_transactions_transaction_velocity_score",
+      "table_name": "fact",
+      "data_type": "integer",
+      "nullable": false,
+      "unique": false,
+      "min_value": 0,
+      "max_value": 100,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "fact_transactions_session_id": {
+      "column_name": "fact_transactions_session_id",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": true,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "fact_transactions_originating_transaction_id": {
+      "column_name": "fact_transactions_originating_transaction_id",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": true,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "fact_transactions_recipient_worker_id": {
+      "column_name": "fact_transactions_recipient_worker_id",
+      "table_name": "fact",
+      "data_type": "string",
+      "nullable": true,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "dim_worker_worker_id": {
+      "column_name": "dim_worker_worker_id",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": true,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "dim_worker_worker_type": {
+      "column_name": "dim_worker_worker_type",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Ride_Hailing_Driver",
+        "Delivery_Rider",
+        "Freelance_Creative",
+        "Market_Trader",
+        "Domestic_Worker",
+        "Construction_Worker",
+        "Street_Vendor"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_worker_gender": {
+      "column_name": "dim_worker_gender",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Male",
+        "Female",
+        "Non_Binary",
+        "Not_Disclosed"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_worker_date_of_birth": {
+      "column_name": "dim_worker_date_of_birth",
+      "table_name": "dim",
+      "data_type": "date",
+      "nullable": true,
+      "unique": false,
+      "min_value": "1930-01-01",
+      "max_value": "2006-12-31",
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "dim_worker_account_tenure_days": {
+      "column_name": "dim_worker_account_tenure_days",
+      "table_name": "dim",
+      "data_type": "integer",
+      "nullable": false,
+      "unique": false,
+      "min_value": 0,
+      "max_value": 3650,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "dim_worker_account_status": {
+      "column_name": "dim_worker_account_status",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Active",
+        "Suspended",
+        "Dormant",
+        "Closed",
+        "Under_Review"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_worker_kyc_level": {
+      "column_name": "dim_worker_kyc_level",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Phone_Verified",
+        "ID_Verified",
+        "Biometric_Verified",
+        "Enhanced_Due_Diligence"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_worker_risk_band": {
+      "column_name": "dim_worker_risk_band",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Low",
+        "Medium",
+        "High",
+        "Critical"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_worker_market_id": {
+      "column_name": "dim_worker_market_id",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "dim_worker_preferred_channel_id": {
+      "column_name": "dim_worker_preferred_channel_id",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": true,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "dim_channel_channel_id": {
+      "column_name": "dim_channel_channel_id",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": true,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "dim_channel_channel_type": {
+      "column_name": "dim_channel_channel_type",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "App",
+        "USSD",
+        "Agent",
+        "Web",
+        "API"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_channel_channel_subtype": {
+      "column_name": "dim_channel_channel_subtype",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Android_App",
+        "iOS_App",
+        "USSD_Self_Service",
+        "USSD_Agent_Assisted",
+        "Agent_Mobile_Money",
+        "Agent_POS",
+        "Agent_Kiosk",
+        "Web_Browser",
+        "Web_PWA",
+        "API_Partner",
+        "API_B2B"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_channel_device_os": {
+      "column_name": "dim_channel_device_os",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Android",
+        "iOS",
+        "KaiOS",
+        "Undetected",
+        "N/A"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_channel_network_type": {
+      "column_name": "dim_channel_network_type",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "2G",
+        "3G",
+        "4G",
+        "5G",
+        "WiFi",
+        "Offline_Sync",
+        "Unknown"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_channel_is_roaming": {
+      "column_name": "dim_channel_is_roaming",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Yes",
+        "No",
+        "Unknown"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_market_market_id": {
+      "column_name": "dim_market_market_id",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": true,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "dim_market_country": {
+      "column_name": "dim_market_country",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": true,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Nigeria",
+        "Kenya",
+        "Ghana",
+        "South Africa"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_market_currency": {
+      "column_name": "dim_market_currency",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": true,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "NGN",
+        "KES",
+        "GHS",
+        "ZAR"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_market_region": {
+      "column_name": "dim_market_region",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Lagos",
+        "Abuja",
+        "Kano",
+        "Port Harcourt",
+        "Nairobi",
+        "Mombasa",
+        "Kisumu",
+        "Nakuru",
+        "Accra",
+        "Kumasi",
+        "Tamale",
+        "Johannesburg",
+        "Cape Town",
+        "Durban",
+        "Pretoria"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_market_regulatory_tier": {
+      "column_name": "dim_market_regulatory_tier",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Tier_1",
+        "Tier_2",
+        "Tier_3"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_market_dominant_channel": {
+      "column_name": "dim_market_dominant_channel",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "App",
+        "USSD",
+        "Agent",
+        "Web",
+        "API"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_market_geospatial_centroid_lat": {
+      "column_name": "dim_market_geospatial_centroid_lat",
+      "table_name": "dim",
+      "data_type": "float",
+      "nullable": false,
+      "unique": false,
+      "min_value": -35.0,
+      "max_value": 13.9,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": {
+        "Nigeria": {
+          "lat_min": 4.27,
+          "lat_max": 13.89,
+          "lon_min": 2.67,
+          "lon_max": 14.68
+        },
+        "Kenya": {
+          "lat_min": -4.68,
+          "lat_max": 4.62,
+          "lon_min": 33.91,
+          "lon_max": 41.9
+        },
+        "Ghana": {
+          "lat_min": 4.74,
+          "lat_max": 11.17,
+          "lon_min": -3.26,
+          "lon_max": 1.2
+        },
+        "South Africa": {
+          "lat_min": -34.84,
+          "lat_max": -22.13,
+          "lon_min": 16.46,
+          "lon_max": 32.89
+        }
+      }
+    },
+    "dim_market_geospatial_centroid_lon": {
+      "column_name": "dim_market_geospatial_centroid_lon",
+      "table_name": "dim",
+      "data_type": "float",
+      "nullable": false,
+      "unique": false,
+      "min_value": -3.26,
+      "max_value": 41.9,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": {
+        "Nigeria": {
+          "lat_min": 4.27,
+          "lat_max": 13.89,
+          "lon_min": 2.67,
+          "lon_max": 14.68
+        },
+        "Kenya": {
+          "lat_min": -4.68,
+          "lat_max": 4.62,
+          "lon_min": 33.91,
+          "lon_max": 41.9
+        },
+        "Ghana": {
+          "lat_min": 4.74,
+          "lat_max": 11.17,
+          "lon_min": -3.26,
+          "lon_max": 1.2
+        },
+        "South Africa": {
+          "lat_min": -34.84,
+          "lat_max": -22.13,
+          "lon_min": 16.46,
+          "lon_max": 32.89
+        }
+      }
+    },
+    "dim_market_agent_network_density": {
+      "column_name": "dim_market_agent_network_density",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Very_High",
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_date_date_id": {
+      "column_name": "dim_date_date_id",
+      "table_name": "dim",
+      "data_type": "integer",
+      "nullable": false,
+      "unique": true,
+      "min_value": 20200101,
+      "max_value": 20261231,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "dim_date_calendar_date": {
+      "column_name": "dim_date_calendar_date",
+      "table_name": "dim",
+      "data_type": "date",
+      "nullable": false,
+      "unique": true,
+      "min_value": "2020-01-01",
+      "max_value": "2026-12-31",
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "dim_date_day_of_week": {
+      "column_name": "dim_date_day_of_week",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_date_week_number": {
+      "column_name": "dim_date_week_number",
+      "table_name": "dim",
+      "data_type": "integer",
+      "nullable": false,
+      "unique": false,
+      "min_value": 1,
+      "max_value": 53,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "dim_date_month_number": {
+      "column_name": "dim_date_month_number",
+      "table_name": "dim",
+      "data_type": "integer",
+      "nullable": false,
+      "unique": false,
+      "min_value": 1,
+      "max_value": 12,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "dim_date_quarter": {
+      "column_name": "dim_date_quarter",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_date_year": {
+      "column_name": "dim_date_year",
+      "table_name": "dim",
+      "data_type": "integer",
+      "nullable": false,
+      "unique": false,
+      "min_value": 2020,
+      "max_value": 2026,
+      "format_pattern": null,
+      "allowed_values": null,
+      "geospatial_bounds": null
+    },
+    "dim_date_is_holiday": {
+      "column_name": "dim_date_is_holiday",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Yes",
+        "No"
+      ],
+      "geospatial_bounds": null
+    },
+    "dim_date_market_trading_session": {
+      "column_name": "dim_date_market_trading_session",
+      "table_name": "dim",
+      "data_type": "string",
+      "nullable": false,
+      "unique": false,
+      "min_value": null,
+      "max_value": null,
+      "format_pattern": null,
+      "allowed_values": [
+        "Pre_Market",
+        "Peak_Morning",
+        "Midday",
+        "Peak_Evening",
+        "Late_Night",
+        "Off_Hours"
+      ],
+      "geospatial_bounds": null
+    }
+  },
+  "table_definitions": {
+    "fact_transactions": {
+      "type": "fact",
+      "columns": [
+        "transaction_id",
+        "worker_id",
+        "date_id",
+        "channel_id",
+        "market_id",
+        "transaction_type",
+        "amount_local",
+        "amount_usd",
+        "transaction_outcome",
+        "is_fraud_flagged",
+        "is_disputed",
+        "is_reversed",
+        "velocity_score",
+        "fraud_loss_usd",
+        "processing_time_ms"
+      ],
+      "primary_key": "transaction_id"
+    },
+    "dim_worker": {
+      "type": "dimension",
+      "columns": [
+        "worker_id",
+        "worker_name",
+        "gig_segment",
+        "account_tenure_days",
+        "kyc_tier",
+        "gender",
+        "age_band",
+        "risk_score",
+        "is_active",
+        "preferred_channel"
+      ],
+      "primary_key": "worker_id"
+    },
+    "dim_channel": {
+      "type": "dimension",
+      "columns": [
+        "channel_id",
+        "channel_type",
+        "channel_subtype",
+        "is_digital",
+        "avg_fraud_rate",
+        "requires_internet"
+      ],
+      "primary_key": "channel_id"
+    },
+    "dim_market": {
+      "type": "dimension",
+      "columns": [
+        "market_id",
+        "country",
+        "iso_code",
+        "local_currency",
+        "dominant_channel",
+        "regulatory_tier",
+        "usd_fx_rate",
+        "market_fraud_index"
+      ],
+      "primary_key": "market_id"
+    },
+    "dim_date": {
+      "type": "dimension",
+      "columns": [
+        "date_id",
+        "full_date",
+        "year",
+        "month",
+        "quarter",
+        "day_of_week",
+        "is_weekend",
+        "is_month_end",
+        "week_number"
+      ],
+      "primary_key": "date_id"
+    }
+  }
+}
