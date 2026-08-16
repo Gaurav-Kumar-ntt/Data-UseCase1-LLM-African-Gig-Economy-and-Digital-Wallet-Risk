@@ -11,3 +11,5 @@ val_8,USSD,Human Agent (Branch),FALSE,675.3635416,FALSE
 val_9,API/Third-Party,SMS OTP Flow,FALSE,156.6841689,TRUE
 val_10,Agent,Human Agent (Field),FALSE,551.533686,FALSE
 val_11,Mobile App,USSD Short Code,FALSE,519.2998581,TRUE
+val_12,USSD,Human Agent (Branch),FALSE,675.3635416,TRUE
+val_13,API/Third-Party,SMS OTP Flow,FALSE,156.6841689,TRUE

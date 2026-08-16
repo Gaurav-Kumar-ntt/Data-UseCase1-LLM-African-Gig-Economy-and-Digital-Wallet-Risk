@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Temporal Trends — Download</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root{
+    --page:#f0f1f6; --card:#ffffff; --ink-1:#0b0e14; --ink-2:#4b5568; --ink-3:#868fa3;
+    --border:rgba(11,14,20,0.09); --accent:#2a78d6;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --page:#0a0c10; --card:#12151b; --ink-1:#ffffff; --ink-2:#b7bfcf; --ink-3:#7e8699;
+      --border:rgba(255,255,255,0.09); --accent:#3987e5; }
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--page); color:var(--ink-1);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    padding: 32px clamp(14px,4vw,48px) 48px;
+  }
+  .wrap{max-width:760px; margin:0 auto;}
+  h1{font-size:22px; font-weight:800; margin:0 0 4px;}
+  p.sub{font-size:13.5px; color:var(--ink-2); margin:0 0 24px;}
+  .cards{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:18px; display:flex; flex-direction:column; gap:10px;
+  }
+  .card img{width:100%; border-radius:8px; border:1px solid var(--border); display:block;}
+  .card h2{font-size:14px; font-weight:700; margin:0;}
+  .card p{font-size:12px; color:var(--ink-3); margin:0;}
+  .dl-btn{
+    background:var(--accent); color:#fff; border:none; border-radius:7px;
+    padding:9px 14px; font-size:13px; font-weight:600; cursor:pointer;
+    font-family:inherit; text-decoration:none; text-align:center;
+  }
+  .notice{
+    margin-top:10px; font-size:11.5px; color:var(--ink-3);
+    background:color-mix(in srgb, var(--accent) 10%, transparent);
+    border-radius:6px; padding:8px 10px; display:none;
+  }
+  .notice.show{display:block;}
+  footer{
+    margin-top:28px; padding-top:14px; border-top:1px solid var(--border);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+    font-size:11px; color:var(--ink-3);
+  }
+  @media (max-width:560px){ .cards{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Temporal trends — download</h1>
+  <p class="sub">Rendered PNG copies of the &ldquo;Temporal trends&rdquo; view (Gig-Economy Wallet Risk, view 4 of 9). Right-click a preview and choose &ldquo;Save Image As&rdquo;, or use the button below it.</p>
+
+  <div class="cards">
+    <div class="card">
+      <h2>Light theme</h2>
+      <img src="temporal_trends_light.png" alt="Temporal trends visualization, light theme" />
+      <a class="dl-btn" href="temporal_trends_light.png" download="temporal_trends_light.png" onclick="notify(this)">Download PNG</a>
+      <div class="notice">Spotted a problem with this visualization? Email gauravkumarjha1195@gmail.com</div>
+    </div>
+    <div class="card">
+      <h2>Dark theme</h2>
+      <img src="temporal_trends_dark.png" alt="Temporal trends visualization, dark theme" />
+      <a class="dl-btn" href="temporal_trends_dark.png" download="temporal_trends_dark.png" onclick="notify(this)">Download PNG</a>
+      <div class="notice">Spotted a problem with this visualization? Email gauravkumarjha1195@gmail.com</div>
+    </div>
+  </div>
+
+  <footer>
+    <span>&copy; Gaurav Kumar, all rights reserved</span>
+    <span>Contact for anything outside scope: gauravkumarjha1195@gmail.com</span>
+  </footer>
+</div>
+<script>
+function notify(btn){
+  const notice = btn.parentElement.querySelector(".notice");
+  notice.classList.add("show");
+}
+</script>
+</body>
+</html>
