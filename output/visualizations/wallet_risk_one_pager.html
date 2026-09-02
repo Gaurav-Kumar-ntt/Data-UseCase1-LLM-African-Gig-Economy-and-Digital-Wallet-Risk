@@ -1,0 +1,776 @@
+<title>Wallet Risk One-Pager</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
+
+<style>
+  :root{
+    --page:#f4f5f7; --surface:#fcfcfd; --surface-2:#f0f1f4;
+    --ink:#12161c; --ink-2:#565e6b; --ink-3:#8b93a1;
+    --hair:#e2e4e9; --hair-2:#d5d8df;
+    --accent:#2a78d6;            /* observed / actual */
+    --spec:#9aa2af;              /* expected / spec reference */
+    --pos:#eb6834;              /* second series (reversed line) */
+    --crit:#d03b3b; --good:#0ca30c;
+    --grid:#e6e8ec; --axis:#c3c7ce;
+    --heat-0:#eef4fc; --heat-1:#cde2fb; --heat-2:#9ec5f4; --heat-3:#6da7ec; --heat-4:#3987e5; --heat-5:#1c5cab; --heat-hi-ink:#ffffff;
+    --div-neg:#2a78d6; --div-pos:#d03b3b; --div-mid:#eceef1;
+    --shadow:0 1px 2px rgba(16,22,28,.05), 0 8px 24px rgba(16,22,28,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --page:#0c0e12; --surface:#15181e; --surface-2:#1b1f26;
+      --ink:#f3f4f6; --ink-2:#a8b0bd; --ink-3:#6c7480;
+      --hair:#262a31; --hair-2:#31363f;
+      --accent:#3987e5; --spec:#6c7480; --pos:#d95926;
+      --crit:#e35b5b; --good:#2bb62b;
+      --grid:#24282f; --axis:#3a3f48;
+      --heat-0:#12233a; --heat-1:#163a63; --heat-2:#1c5cab; --heat-3:#2a78d6; --heat-4:#3987e5; --heat-5:#6da7ec; --heat-hi-ink:#0c0e12;
+      --div-neg:#3987e5; --div-pos:#e35b5b; --div-mid:#242832;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --page:#0c0e12; --surface:#15181e; --surface-2:#1b1f26;
+    --ink:#f3f4f6; --ink-2:#a8b0bd; --ink-3:#6c7480;
+    --hair:#262a31; --hair-2:#31363f;
+    --accent:#3987e5; --spec:#6c7480; --pos:#d95926;
+    --crit:#e35b5b; --good:#2bb62b;
+    --grid:#24282f; --axis:#3a3f48;
+    --heat-0:#12233a; --heat-1:#163a63; --heat-2:#1c5cab; --heat-3:#2a78d6; --heat-4:#3987e5; --heat-5:#6da7ec; --heat-hi-ink:#0c0e12;
+    --div-neg:#3987e5; --div-pos:#e35b5b; --div-mid:#242832;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0; background:var(--page); color:var(--ink);
+    font-family:"Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1200px; margin:0 auto; padding:26px clamp(14px,3.5vw,40px) 60px;}
+
+  /* ---------- header ---------- */
+  header.top{
+    display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between;
+    gap:16px 24px; padding-bottom:18px; border-bottom:1px solid var(--hair); margin-bottom:22px;
+  }
+  .title-blk h1{
+    font-family:"Archivo", system-ui, sans-serif; font-weight:800; letter-spacing:-.02em;
+    font-size:clamp(22px,3.4vw,32px); margin:0 0 6px; text-wrap:balance;
+  }
+  .title-blk p{margin:0; color:var(--ink-2); font-size:13px; max-width:62ch;}
+  .kicker{
+    font-family:"IBM Plex Mono", monospace; font-size:11px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--ink-3); margin:0 0 8px;
+  }
+  .hdr-tools{display:flex; flex-direction:column; align-items:flex-end; gap:8px;}
+  button.audio{
+    display:inline-flex; align-items:center; gap:8px; cursor:pointer;
+    background:var(--accent); color:#fff; border:none; border-radius:8px;
+    font-family:"Public Sans",sans-serif; font-weight:600; font-size:13px;
+    padding:9px 15px; box-shadow:var(--shadow); transition:filter .15s;
+  }
+  button.audio:hover{filter:brightness(1.06);}
+  button.audio:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+  button.audio .ic{width:13px; height:13px; display:inline-block;}
+  .hdr-note{font-size:11px; color:var(--ink-3); font-family:"IBM Plex Mono",monospace;}
+
+  /* ---------- verdict banner ---------- */
+  .verdict{
+    display:flex; gap:14px; align-items:flex-start;
+    background:var(--surface); border:1px solid var(--hair); border-left:4px solid var(--crit);
+    border-radius:10px; padding:14px 18px; margin-bottom:24px; box-shadow:var(--shadow);
+  }
+  .verdict .vlab{
+    font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:11px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--crit); white-space:nowrap; padding-top:2px;
+  }
+  .verdict p{margin:0; font-size:13px; color:var(--ink);}
+  .verdict strong{font-weight:700;}
+
+  /* ---------- panels ---------- */
+  .grid{display:grid; grid-template-columns:repeat(12,1fr); gap:18px;}
+  .panel{
+    grid-column:span 12; background:var(--surface); border:1px solid var(--hair);
+    border-radius:12px; padding:18px 18px 20px; box-shadow:var(--shadow); min-width:0;
+  }
+  .panel.half{grid-column:span 6;}
+  .panel.third{grid-column:span 4;}
+  @media (max-width:900px){ .panel.half,.panel.third{grid-column:span 12;} }
+  .p-head{display:flex; align-items:baseline; gap:10px; margin-bottom:4px;}
+  .p-num{
+    font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:12px; color:var(--accent);
+  }
+  .p-title{font-family:"Archivo",sans-serif; font-weight:700; font-size:15px; letter-spacing:-.01em;}
+  .p-sub{color:var(--ink-2); font-size:12px; margin:0 0 14px;}
+  .p-sub b{color:var(--ink); font-weight:600;}
+
+  /* ---------- KPI tiles ---------- */
+  .kpis{display:grid; grid-template-columns:repeat(6,1fr); gap:10px;}
+  @media (max-width:860px){ .kpis{grid-template-columns:repeat(3,1fr);} }
+  @media (max-width:520px){ .kpis{grid-template-columns:repeat(2,1fr);} }
+  .kpi{
+    background:var(--surface-2); border:1px solid var(--hair); border-radius:9px; padding:11px 12px;
+  }
+  .kpi .v{font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:19px; letter-spacing:-.02em;}
+  .kpi .l{font-size:10.5px; color:var(--ink-3); text-transform:uppercase; letter-spacing:.06em; margin-top:3px;}
+  .flagrow{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px;}
+  @media (max-width:520px){ .flagrow{grid-template-columns:1fr;} }
+  .flag{
+    border:1px solid var(--hair); border-left:3px solid var(--crit); border-radius:9px;
+    padding:11px 13px; background:var(--surface-2);
+  }
+  .flag .fv{font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:20px; color:var(--crit);}
+  .flag .fl{font-size:11px; color:var(--ink-2); margin-top:2px;}
+  .flag .fs{font-size:10.5px; color:var(--ink-3); font-family:"IBM Plex Mono",monospace; margin-top:4px;}
+
+  /* ---------- claims cards ---------- */
+  .claims{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  @media (max-width:900px){ .claims{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .claims{grid-template-columns:1fr;} }
+  .claim{border:1px solid var(--hair); border-radius:10px; padding:12px 13px; background:var(--surface-2); display:flex; flex-direction:column; gap:9px;}
+  .claim .ctext{font-size:12px; color:var(--ink); font-weight:600; line-height:1.4;}
+  .chip{
+    align-self:flex-start; font-family:"IBM Plex Mono",monospace; font-size:9.5px; font-weight:600;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--crit);
+    border:1px solid color-mix(in srgb, var(--crit) 40%, transparent); border-radius:5px; padding:2px 6px;
+  }
+  .claim .cstat{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--ink-2);}
+  .claim .cstat b{color:var(--ink);}
+  .minibar{height:22px; display:flex; flex-direction:column; gap:3px; margin-top:2px;}
+  .mb-track{position:relative; height:8px; background:var(--surface); border:1px solid var(--hair); border-radius:4px; overflow:hidden;}
+  .mb-fill{position:absolute; left:0; top:0; bottom:0; border-radius:3px;}
+  .mb-lab{display:flex; justify-content:space-between; font-family:"IBM Plex Mono",monospace; font-size:9px; color:var(--ink-3);}
+
+  /* ---------- generic svg ---------- */
+  .chart{width:100%; height:auto; display:block; overflow:visible; font-family:"IBM Plex Mono",monospace;}
+  .scroll-x{overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;}
+  text{fill:var(--ink-2);}
+  .ax{fill:var(--ink-3); font-size:10px;}
+  .axlab{fill:var(--ink-3); font-size:9.5px;}
+  .val{fill:var(--ink); font-size:10px; font-weight:600;}
+  .gl{stroke:var(--grid); stroke-width:1;}
+  .base{stroke:var(--axis); stroke-width:1;}
+
+  .legend{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:10px; font-size:11px; color:var(--ink-2);}
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .sw{width:11px; height:11px; border-radius:3px; display:inline-block; flex:0 0 auto;}
+
+  /* ---------- drift table ---------- */
+  .tbl-scroll{overflow-x:auto; margin-top:6px;}
+  table.drift{border-collapse:collapse; width:100%; font-size:11.5px;}
+  table.drift th,table.drift td{text-align:left; padding:6px 10px; border-bottom:1px solid var(--hair); white-space:nowrap;}
+  table.drift th{font-family:"IBM Plex Mono",monospace; font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-3); font-weight:600;}
+  table.drift td:first-child{font-family:"IBM Plex Mono",monospace; color:var(--ink); font-weight:500;}
+  table.drift .spec{color:var(--ink-3);}
+  table.drift .obs{color:var(--accent); font-family:"IBM Plex Mono",monospace;}
+
+  /* ---------- heatmap ---------- */
+  .heat{display:grid; grid-template-columns:auto repeat(4,1fr); gap:4px; font-family:"IBM Plex Mono",monospace;}
+  .heat .hh{font-size:10px; color:var(--ink-3); text-align:center; padding:4px 0; text-transform:uppercase; letter-spacing:.06em;}
+  .heat .rh{font-size:10.5px; color:var(--ink-2); display:flex; align-items:center; padding-right:8px; justify-content:flex-end; white-space:nowrap;}
+  .heat .cell{
+    aspect-ratio:2.3/1; min-height:40px; border-radius:6px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; color:var(--ink); border:1px solid var(--hair);
+  }
+  .heat .cell .cv{font-size:12.5px; font-weight:600;}
+  .heat .cell .cn{font-size:8.5px; color:var(--ink-2); opacity:.85;}
+  .heatscale{display:flex; align-items:center; gap:8px; margin-top:12px; font-size:10px; color:var(--ink-3); font-family:"IBM Plex Mono",monospace;}
+  .heatscale .ramp{display:flex; height:9px; border-radius:3px; overflow:hidden; flex:0 0 140px;}
+  .heatscale .ramp i{flex:1;}
+
+  /* ---------- next steps ---------- */
+  ol.steps{margin:0; padding:0; list-style:none; counter-reset:s; display:grid; gap:9px;}
+  ol.steps li{
+    position:relative; padding:10px 12px 10px 40px; background:var(--surface-2);
+    border:1px solid var(--hair); border-radius:9px; font-size:12.5px; color:var(--ink); counter-increment:s;
+  }
+  ol.steps li::before{
+    content:counter(s,decimal-leading-zero); position:absolute; left:12px; top:10px;
+    font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:600; color:var(--accent);
+  }
+  ol.steps li b{font-weight:700;}
+
+  footer.pg{
+    margin-top:34px; padding-top:16px; border-top:1px solid var(--hair);
+    display:flex; flex-wrap:wrap; gap:6px 20px; justify-content:space-between;
+    font-size:11px; color:var(--ink-3); font-family:"IBM Plex Mono",monospace;
+  }
+
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="title-blk">
+      <p class="kicker">DataDNA · African Gig-Economy &amp; Digital Wallet Risk</p>
+      <h1>Wallet Risk One-Pager</h1>
+      <p>All 9 standard views on one page. Every figure computed from the joined extract
+         <b>output/fact_transactions_with_channel</b> — 50,000 transactions, 4 markets, Jan 2023 – Dec 2024.</p>
+    </div>
+    <div class="hdr-tools">
+      <button class="audio" id="audioBtn" type="button" aria-label="Play spoken audio summary">
+        <svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>
+        <span id="audioLbl">Play audio summary</span>
+      </button>
+      <span class="hdr-note">Adapts to light / dark · offline speech</span>
+    </div>
+  </header>
+
+  <div class="verdict">
+    <span class="vlab">Headline</span>
+    <p><strong>None of the 6 brief claims reproduce on this extract.</strong> The three risk flags
+       (<b>is_fraud_flagged</b>, <b>is_disputed</b>, <b>is_reversed</b>) each sample at
+       <strong>~50%</strong> against a documented spec of <strong>7% / 5% / 8%</strong> — a coin-flip
+       generator, not weighted sampling. Every entity cut sits within ±1.5 pp of that ~50% mean, and
+       velocity vs. fraud correlation is <strong>r ≈ 0</strong>. Category domains and numeric ranges
+       have also drifted well outside the data dictionary.</p>
+  </div>
+
+  <div class="grid" id="grid"><!-- panels injected --></div>
+
+  <footer class="pg">
+    <span>© Gaurav Kumar, all rights reserved</span>
+    <span>Outside these 9 views? Contact gauravkumarjha1195@gmail.com</span>
+  </footer>
+</div>
+
+<script>
+/* ============ computed data (from output/fact_transactions_with_channel.parquet) ============ */
+const D = {
+  kpi:{
+    n:"50,000", workers:"4,999", markets:"4", chan:"12 / 5", vol:"$24.98M", medtxn:"$499",
+    loss:"$12.56M",
+    fraud:{v:"50.29%", n:"25,145", spec:"7%"},
+    disp:{v:"50.07%", n:"25,035", spec:"5%"},
+    rev:{v:"49.90%", n:"24,952", spec:"8%"}
+  },
+  claims:[
+    {t:"USSD channel shows 2.3× higher fraud rate than app",
+     stat:"USSD 51.2% vs App 50.3% — ratio 1.02×", claim:2.3, actual:1.02, unit:"×", max:2.6},
+    {t:"Nigeria + Kenya drive 70% of fraud volume",
+     stat:"NG+KE = 49.8% (GH 25.5 · KE 25.0 · NG 24.8 · ZA 24.7)", claim:70, actual:49.8, unit:"%", max:100},
+    {t:"New accounts under 90 days show 3× higher fraud rate",
+     stat:"<90d 51.1% vs ≥90d 50.2% — ratio 1.02×", claim:3.0, actual:1.02, unit:"×", max:3.3},
+    {t:"Market traders have the highest dispute rate of any gig segment",
+     stat:"Market Trader 49.4% — rank 10 of 15 (top: Informal Vendor 53.3%)", claim:1, actual:0, unit:"", max:1, rankNote:true},
+    {t:"High velocity score correlates with fraud and reversal",
+     stat:"r = −0.001 (fraud) · r = +0.003 (reversed) — no relationship", claim:1, actual:0, unit:"", max:1, corrNote:true},
+    {t:"Month-end spikes in cash-out and reversal rates",
+     stat:"Reversal 51.7% vs 49.8% · fraud 51.2% vs 50.3% (n=1,575 rows) — within noise", claim:1, actual:0, unit:"", max:1, noiseNote:true}
+  ],
+  flags:[
+    {k:"is_fraud_flagged", spec:7, obs:50.29},
+    {k:"is_disputed", spec:5, obs:50.07},
+    {k:"is_reversed", spec:8, obs:49.90}
+  ],
+  drift:[
+    ["gig_segment","4 categories","15 categories"],
+    ["transaction_type","5 values","13 values"],
+    ["transaction_outcome","4 values","8 values"],
+    ["kyc_tier","3 tiers","4 tiers"],
+    ["channel_type","app/ussd/agent/card/bank","5 values, all renamed"],
+    ["gender","3 values","4 values (+Non-Binary)"],
+    ["age_band","skew 25–34 (38%)","near-uniform, 5 bands"],
+    ["amount_usd","lognormal, median ≈ $45","~uniform $0–1000, median $499"],
+    ["amount_local","lognormal (μ=5.2)","~uniform $0–1000, median $498"],
+    ["velocity_score","uniform 0–10","0–1000 (mean 499)"],
+    ["processing_time_ms","normal(850, 300)","0–1000 uniform (mean 500)"],
+    ["risk_score","beta(2,5), 0–1","0–100 (mean 50.4)"],
+    ["avg_fraud_rate","0.02 – 0.15","157 – 858"],
+    ["market_fraud_index","0.5 – 2.0","268 – 798"],
+    ["usd_fx_rate","1.0 – 1600","80 – 872"],
+    ["is_active","88% active","49% active"],
+    ["week_number","ISO week 1–53","NULL for all 50,000 rows"]
+  ],
+  monthly:[
+    ["2023-01",49.34],["2023-02",51.34],["2023-03",48.92],["2023-04",51.09],["2023-05",48.84],
+    ["2023-06",49.98],["2023-07",48.81],["2023-08",50.87],["2023-09",50.56],["2023-10",52.52],
+    ["2023-11",48.78],["2023-12",50.94],["2024-01",50.00],["2024-02",50.53],["2024-03",50.07],
+    ["2024-04",52.47],["2024-05",51.27],["2024-06",48.64],["2024-07",49.36],["2024-08",50.25],
+    ["2024-09",50.83],["2024-10",48.92],["2024-11",52.45],["2024-12",50.27]
+  ],
+  monMean:50.29, monStd:1.20,
+  dow:[["Mon",50.08],["Tue",49.87],["Wed",50.11],["Thu",50.28],["Fri",50.22],["Sat",50.49],["Sun",51.00]],
+  monthEnd:{feFraud:51.24, nmFraud:50.26, meRev:51.75, nmRev:49.84},
+  entity:{
+    grand:50.29,
+    channel:[["Agent",-0.96,0.45],["Mobile App",0.04,0.54],["API/Third-Party",0.21,0.45],["POS",0.42,0.45],["USSD",0.90,0.77]],
+    country:[["South Africa",-0.54,0.45],["Kenya",0.06,0.45],["Nigeria",0.08,0.45],["Ghana",0.39,0.44]],
+    kyc:[["Tier 3 · Addr+Income",-0.26,0.46],["Tier 2 · ID",-0.13,0.44],["Tier 1 · Phone",-0.14,0.45],["Tier 0 · Unverified",0.51,0.44]],
+    tenure:[["2y+",-0.30,0.29],["180–365d",-0.14,0.69],["1–2y",0.59,0.50],["90–180d",0.64,1.02],["<90d",0.90,1.00]],
+    segment:[
+      ["Logistics Driver (Truck/Van)",-1.45,0.89],["Market Trader",-1.19,0.92],["On-Demand Handyman",-0.64,0.87],
+      ["Food Delivery Courier",-0.45,0.84],["Motorcycle Taxi Rider",-0.42,0.86],["Online Freelancer (Tech)",-0.38,0.86],
+      ["Freelance Creative",-0.23,0.83],["Ride-Hailing Driver",-0.18,0.87],["Delivery Rider",-0.00,0.87],
+      ["Informal Vendor",0.18,0.90],["Mobile Money Agent",0.30,0.86],["Tutor / Private Instructor",0.39,0.91],
+      ["E-commerce Reseller",0.79,0.84],["Domestic Worker",1.49,0.84],["Agricultural Day Labourer",1.50,0.85]
+    ]
+  },
+  byType:[
+    ["Wallet Funding via Card",3924],["Bill Payment",3901],["Cash-In",3895],["Peer Transfer",3881],
+    ["Cash-Out",3871],["Wallet Funding via Bank Transfer",3865],["Agent Withdrawal",3851],
+    ["Salary/Earnings Disbursement",3845],["Airtime Top-Up",3842],["Reversal",3839],["Refund",3818],
+    ["Cross-Border Remittance",3750],["Merchant Payment",3718]
+  ],
+  outcome:[
+    ["Completed",12.64],["Timeout",12.60],["Partially Completed",12.57],["Pending",12.52],
+    ["Disputed",12.50],["Failed",12.50],["Declined",12.44],["Reversed",12.22]
+  ],
+  amtHist:[4884,5069,5111,5041,4952,4977,4991,5074,4908,4993],
+  heat:{
+    cols:["NG","KE","GH","ZA"],
+    rows:[
+      ["USSD",[52.23,51.09,51.91,49.52]],
+      ["Mobile App",[49.90,50.71,52.72,48.10]],
+      ["Agent",[49.50,48.95,49.29,49.60]],
+      ["POS",[51.37,50.99,50.17,50.31]],
+      ["API/Third-Party",[49.94,50.67,50.79,50.61]]
+    ],
+    min:48.10, max:52.72
+  },
+  velo:{
+    dec:[[1,50.06],[2,51.64],[3,50.26],[4,50.28],[5,49.02],[6,49.52],[7,50.96],[8,50.38],[9,50.58],[10,50.20]],
+    rFraud:"−0.001", rRev:"+0.003"
+  },
+  steps:[
+    ["Do not model on this extract.","Treat it as unfit for risk scoring — no training, tuning, or thresholding until the generator is fixed."],
+    ["Repair the event generator.","is_fraud_flagged / is_disputed / is_reversed sample ~50% vs the 7% / 5% / 8% spec — restore weighted sampling."],
+    ["Restore documented distributions.","amount_usd / amount_local (lognormal), velocity_score (0–10), processing_time_ms (N(850,300)), risk_score (0–1) are all wrong."],
+    ["Re-align category domains.","gig_segment 15≠4, transaction_type 13≠5, transaction_outcome 8≠4, kyc_tier 4≠3 — fix the data or the dictionary."],
+    ["Fix dimension rate fields.","avg_fraud_rate (157–858), market_fraud_index (268–798), usd_fx_rate (80–872) hold out-of-range magnitudes."],
+    ["Populate week_number.","NULL for all 50,000 rows in dim_date — no ISO-week analysis possible."],
+    ["Add conformance checks.","VALIDATION_REPORT passes 9/9 but only covers null / unique / presence, not rate or distribution."],
+    ["Re-test the 6 claims after regeneration.","Only then revisit USSD, month-end, velocity, and new-account hypotheses."]
+  ]
+};
+
+/* ============ tiny svg helpers ============ */
+const SVGNS="http://www.w3.org/2000/svg";
+function svg(w,h){const s=document.createElementNS(SVGNS,"svg");s.setAttribute("viewBox",`0 0 ${w} ${h}`);s.setAttribute("class","chart");s.setAttribute("preserveAspectRatio","xMidYMid meet");return s;}
+function n(tag,attrs,txt){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(txt!=null)e.textContent=txt;return e;}
+function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
+function cvar(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim();}
+
+function panel(num,title,sub,spanCls){
+  const p=el("div","panel"+(spanCls?" "+spanCls:""));
+  const h=el("div","p-head");
+  h.appendChild(el("span","p-num",num));
+  h.appendChild(el("span","p-title",title));
+  p.appendChild(h);
+  if(sub){const s=el("p","p-sub");s.innerHTML=sub;p.appendChild(s);}
+  return p;
+}
+function legend(items){
+  const l=el("div","legend");
+  items.forEach(it=>{
+    const s=el("span");
+    const sw=el("span","sw");sw.style.background=it.c;
+    s.appendChild(sw);s.appendChild(document.createTextNode(it.t));
+    l.appendChild(s);
+  });
+  return l;
+}
+
+const G=document.getElementById("grid");
+
+/* ---------- 01 KPI ---------- */
+(function(){
+  const p=panel("01","KPI summary","Portfolio totals, and the three risk flags at <b>~50%</b> against a <b>5–8% spec</b>.");
+  const k=el("div","kpis");
+  [["50,000","transactions"],["4,999","gig workers"],["4","markets · NG KE GH ZA"],
+   ["12 / 5","channels / types"],["$24.98M","total volume (USD)"],["$12.56M","flagged fraud loss"]]
+   .forEach(([v,l])=>{const c=el("div","kpi");c.appendChild(el("div","v",v));c.appendChild(el("div","l",l));k.appendChild(c);});
+  p.appendChild(k);
+  const fr=el("div","flagrow");
+  [["is_fraud_flagged","50.29%","25,145 rows","spec 7%"],
+   ["is_disputed","50.07%","25,035 rows","spec 5%"],
+   ["is_reversed","49.90%","24,952 rows","spec 8%"]]
+   .forEach(([kk,v,nn,sp])=>{
+     const f=el("div","flag");
+     f.appendChild(el("div","fv",v));
+     f.appendChild(el("div","fl",kk+" — "+nn));
+     f.appendChild(el("div","fs",sp+"  ·  ≈ 7× to 10× over spec"));
+     fr.appendChild(f);
+   });
+  p.appendChild(fr);
+  G.appendChild(p);
+})();
+
+/* ---------- 02 Claims vs data ---------- */
+(function(){
+  const p=panel("02","Claims vs. data","All 6 headline claims from the brief — each <b>not reproducible</b>; bar shows claimed vs. observed.");
+  const box=el("div","claims");
+  D.claims.forEach(c=>{
+    const d=el("div","claim");
+    d.appendChild(el("div","ctext",c.t));
+    d.appendChild(el("span","chip","Not reproducible"));
+    const st=el("div","cstat");st.innerHTML=c.stat;d.appendChild(st);
+    if(!c.rankNote && !c.corrNote && !c.noiseNote){
+      const mb=el("div","minibar");
+      const t1=el("div","mb-track");const f1=el("div","mb-fill");
+      f1.style.width=(100*c.claim/c.max)+"%";f1.style.background="var(--spec)";t1.appendChild(f1);
+      const t2=el("div","mb-track");const f2=el("div","mb-fill");
+      f2.style.width=(100*c.actual/c.max)+"%";f2.style.background="var(--accent)";t2.appendChild(f2);
+      const lab=el("div","mb-lab");
+      lab.appendChild(el("span",null,"claimed "+c.claim+c.unit));
+      lab.appendChild(el("span",null,"observed "+c.actual+c.unit));
+      mb.appendChild(t1);mb.appendChild(t2);mb.appendChild(lab);
+      d.appendChild(mb);
+    }
+    box.appendChild(d);
+  });
+  p.appendChild(box);
+  p.appendChild(legend([{t:"claimed",c:"var(--spec)"},{t:"observed",c:"var(--accent)"}]));
+  G.appendChild(p);
+})();
+
+/* ---------- 03 Dictionary vs observed ---------- */
+(function(){
+  const p=panel("03","Dictionary vs. observed","Spec vs. actual for the 3 risk flags (log scale), plus 17 other drifted fields.","half");
+  const W=460,H=190,ml=44,mr=14,mt=10,mb=42;
+  const s=svg(W,H);
+  const iw=W-ml-mr, ih=H-mt-mb;
+  const ticks=[1,2,5,10,20,50,100];
+  const y=v=>mt+ih-(Math.log10(Math.max(v,0.7))/Math.log10(120))*ih;
+  ticks.forEach(t=>{
+    s.appendChild(n("line",{x1:ml,x2:ml+iw,y1:y(t),y2:y(t),class:"gl"}));
+    s.appendChild(n("text",{x:ml-6,y:y(t)+3,"text-anchor":"end",class:"ax"},t+"%"));
+  });
+  const grp=iw/D.flags.length;
+  D.flags.forEach((f,i)=>{
+    const cx=ml+grp*i+grp/2, bw=26;
+    s.appendChild(n("rect",{x:cx-bw-3,y:y(f.spec),width:bw,height:mt+ih-y(f.spec),rx:3,fill:cvar("--spec")}));
+    s.appendChild(n("rect",{x:cx+3,y:y(f.obs),width:bw,height:mt+ih-y(f.obs),rx:3,fill:cvar("--accent")}));
+    s.appendChild(n("text",{x:cx-bw/2-3,y:y(f.spec)-4,"text-anchor":"middle",class:"axlab"},f.spec+"%"));
+    s.appendChild(n("text",{x:cx+bw/2+3,y:y(f.obs)-4,"text-anchor":"middle",class:"val"},f.obs+"%"));
+    s.appendChild(n("text",{x:cx,y:H-mb+16,"text-anchor":"middle",class:"ax"},f.k));
+  });
+  s.appendChild(n("line",{x1:ml,x2:ml+iw,y1:mt+ih,y2:mt+ih,class:"base"}));
+  p.appendChild(s);
+  p.appendChild(legend([{t:"spec weight",c:"var(--spec)"},{t:"observed rate",c:"var(--accent)"}]));
+  G.appendChild(p);
+
+  const p2=panel("03","Other drifted fields","17 fields where the observed domain or range leaves the data dictionary.","half");
+  const sc=el("div","tbl-scroll");
+  const tb=el("table","drift");
+  tb.innerHTML="<thead><tr><th>Field</th><th>Dictionary</th><th>Observed</th></tr></thead>";
+  const body=el("tbody");
+  D.drift.forEach(([f,sp,ob])=>{
+    const tr=el("tr");
+    tr.appendChild(el("td",null,f));
+    tr.appendChild(el("td","spec",sp));
+    tr.appendChild(el("td","obs",ob));
+    body.appendChild(tr);
+  });
+  tb.appendChild(body);sc.appendChild(tb);p2.appendChild(sc);
+  G.appendChild(p2);
+})();
+
+/* ---------- 04 Temporal trends ---------- */
+(function(){
+  const p=panel("04","Temporal trends","24-month fraud rate, y-axis zoomed to 46–54% — the wobble is noise (σ = 1.2 pp), not seasonality.");
+  const W=920,H=250,ml=42,mr=16,mt=14,mb=52;
+  const s=svg(W,H);
+  const iw=W-ml-mr, ih=H-mt-mb;
+  const lo=46,hi=54;
+  const y=v=>mt+ih-((v-lo)/(hi-lo))*ih;
+  const x=i=>ml+(iw/(D.monthly.length-1))*i;
+  for(let v=46;v<=54;v+=2){
+    s.appendChild(n("line",{x1:ml,x2:ml+iw,y1:y(v),y2:y(v),class:"gl"}));
+    s.appendChild(n("text",{x:ml-6,y:y(v)+3,"text-anchor":"end",class:"ax"},v+"%"));
+  }
+  // mean ± std band
+  s.appendChild(n("rect",{x:ml,y:y(D.monMean+D.monStd),width:iw,height:y(D.monMean-D.monStd)-y(D.monMean+D.monStd),
+    fill:cvar("--accent"),opacity:0.10}));
+  s.appendChild(n("line",{x1:ml,x2:ml+iw,y1:y(D.monMean),y2:y(D.monMean),stroke:cvar("--accent"),"stroke-width":1,"stroke-dasharray":"4 4",opacity:0.6}));
+  s.appendChild(n("text",{x:ml+6,y:y(D.monMean+D.monStd)-4,"text-anchor":"start",class:"axlab"},"mean 50.3%  ·  ± 1σ band = 49.1–51.5%"));
+  // line
+  let dpath="";
+  D.monthly.forEach((m,i)=>{dpath+=(i?"L":"M")+x(i)+" "+y(m[1])+" ";});
+  s.appendChild(n("path",{d:dpath,fill:"none",stroke:cvar("--accent"),"stroke-width":2,"stroke-linejoin":"round"}));
+  D.monthly.forEach((m,i)=>{
+    s.appendChild(n("circle",{cx:x(i),cy:y(m[1]),r:2.6,fill:cvar("--accent")}));
+    if(i%3===0)s.appendChild(n("text",{x:x(i),y:H-mb+16,"text-anchor":"middle",class:"ax"},m[0]));
+  });
+  s.appendChild(n("line",{x1:ml,x2:ml+iw,y1:mt+ih,y2:mt+ih,class:"base"}));
+  // range note
+  s.appendChild(n("text",{x:ml,y:H-mb+34,class:"axlab"},"range 48.6% (Jun-24) – 52.5% (Oct-23)  ·  no trend, no quarter effect"));
+  p.appendChild(s);
+
+  // sub row: DOW + month-end
+  const row=el("div");row.style.display="grid";row.style.gridTemplateColumns="1.4fr 1fr";row.style.gap="18px";
+  row.style.marginTop="14px";row.style.alignItems="start";
+  if(window.matchMedia("(max-width:640px)").matches)row.style.gridTemplateColumns="1fr";
+
+  // DOW mini bars
+  const dw=svg(440,140);
+  (function(){
+    const W2=440,H2=140,ml2=34,mt2=10,mb2=26,mr2=8;
+    const iw2=W2-ml2-mr2, ih2=H2-mt2-mb2;
+    const lo2=48,hi2=52;
+    const yy=v=>mt2+ih2-((v-lo2)/(hi2-lo2))*ih2;
+    for(let v=48;v<=52;v+=1){
+      dw.appendChild(n("line",{x1:ml2,x2:ml2+iw2,y1:yy(v),y2:yy(v),class:"gl"}));
+      dw.appendChild(n("text",{x:ml2-5,y:yy(v)+3,"text-anchor":"end",class:"ax"},v+"%"));
+    }
+    const bw=iw2/D.dow.length*0.6;
+    D.dow.forEach((d,i)=>{
+      const cx=ml2+(iw2/D.dow.length)*(i+0.5);
+      dw.appendChild(n("rect",{x:cx-bw/2,y:yy(d[1]),width:bw,height:mt2+ih2-yy(d[1]),rx:2,fill:cvar("--accent")}));
+      dw.appendChild(n("text",{x:cx,y:H2-mb2+15,"text-anchor":"middle",class:"ax"},d[0]));
+    });
+    dw.appendChild(n("line",{x1:ml2,x2:ml2+iw2,y1:mt2+ih2,y2:mt2+ih2,class:"base"}));
+    dw.appendChild(n("text",{x:ml2,y:9,class:"axlab"},"fraud rate by day of week — flat (49.9–51.0%)"));
+  })();
+  const dwWrap=el("div");dwWrap.appendChild(dw);
+  row.appendChild(dwWrap);
+
+  // month-end compare
+  const me=el("div");
+  me.style.fontFamily='"IBM Plex Mono",monospace';me.style.fontSize="11.5px";me.style.color="var(--ink-2)";
+  const mscale=v=>((v-48)/(53-48))*100;
+  me.innerHTML=`<div style="font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-bottom:8px">Month-end vs. rest &nbsp;(axis 48–53%)</div>
+    <div style="display:grid;grid-template-columns:auto 1fr auto;gap:7px 10px;align-items:center">
+      <span>fraud · ME</span><div class="mb-track" style="height:9px"><div class="mb-fill" style="width:${mscale(51.24)}%;background:var(--accent)"></div></div><b style="color:var(--ink)">51.2%</b>
+      <span>fraud · rest</span><div class="mb-track" style="height:9px"><div class="mb-fill" style="width:${mscale(50.26)}%;background:var(--spec)"></div></div><span>50.3%</span>
+      <span>reversal · ME</span><div class="mb-track" style="height:9px"><div class="mb-fill" style="width:${mscale(51.75)}%;background:var(--accent)"></div></div><b style="color:var(--ink)">51.7%</b>
+      <span>reversal · rest</span><div class="mb-track" style="height:9px"><div class="mb-fill" style="width:${mscale(49.84)}%;background:var(--spec)"></div></div><span>49.8%</span>
+    </div>
+    <div style="margin-top:9px;font-size:10px;color:var(--ink-3)">+1 pp gap on ~1,575 month-end rows — inside sampling noise, no spike.</div>`;
+  row.appendChild(me);
+  p.appendChild(row);
+  p.appendChild(legend([{t:"fraud rate (monthly)",c:"var(--accent)"},{t:"mean ± 1σ band",c:"color-mix(in srgb, var(--accent) 30%, transparent)"}]));
+  G.appendChild(p);
+})();
+
+/* ---------- 05 Entity analysis ---------- */
+(function(){
+  const p=panel("05","Entity analysis","Fraud-rate deviation from the 50.29% grand mean (pp), ± standard error — every cut lands inside ±1.5 pp.");
+  const groups=[
+    ["Channel type",D.entity.channel],
+    ["Market",D.entity.country],
+    ["KYC tier",D.entity.kyc],
+    ["Account tenure",D.entity.tenure],
+    ["Gig segment — all 15",D.entity.segment]
+  ];
+  const W=920, rowH=17, pad=8;
+  let total=0; groups.forEach(g=>total+=g[1].length*rowH+30);
+  const H=total+30;
+  const s=svg(W,H);
+  const ml=214, mr=58, cx=ml+(W-ml-mr)/2;
+  const span=2.7; // pp each side
+  const xx=v=>cx+(v/span)*((W-ml-mr)/2);
+  let yc=14;
+  // zero line + ticks
+  [-2,-1,0,1,2].forEach(t=>{
+    s.appendChild(n("line",{x1:xx(t),x2:xx(t),y1:8,y2:H-22,stroke:t===0?cvar("--axis"):cvar("--grid"),"stroke-width":t===0?1.2:1}));
+    s.appendChild(n("text",{x:xx(t),y:H-9,"text-anchor":"middle",class:"ax"},(t>0?"+":"")+t+"pp"));
+  });
+  groups.forEach(([label,rows])=>{
+    s.appendChild(n("text",{x:6,y:yc+10,class:"axlab",style:"fill:var(--ink);font-weight:600;font-size:10px"},label));
+    yc+=20;
+    rows.forEach(r=>{
+      const [name,dev,se]=r;
+      const y0=yc+rowH/2;
+      s.appendChild(n("text",{x:ml-10,y:y0+3,"text-anchor":"end",class:"ax",style:"font-size:9.5px"},name.length>30?name.slice(0,29)+"…":name));
+      // SE whisker
+      s.appendChild(n("line",{x1:xx(dev-se),x2:xx(dev+se),y1:y0,y2:y0,stroke:cvar("--ink-3"),"stroke-width":1}));
+      s.appendChild(n("line",{x1:xx(dev-se),x2:xx(dev-se),y1:y0-3,y2:y0+3,stroke:cvar("--ink-3"),"stroke-width":1}));
+      s.appendChild(n("line",{x1:xx(dev+se),x2:xx(dev+se),y1:y0-3,y2:y0+3,stroke:cvar("--ink-3"),"stroke-width":1}));
+      // bar
+      const c=dev>=0?cvar("--div-pos"):cvar("--div-neg");
+      s.appendChild(n("rect",{x:Math.min(cx,xx(dev)),y:y0-4,width:Math.abs(xx(dev)-cx),height:8,rx:2,fill:c}));
+      s.appendChild(n("text",{x:xx(dev)+(dev>=0?8:-8),y:y0+3,"text-anchor":dev>=0?"start":"end",class:"val",style:"font-size:9px"},(dev>=0?"+":"")+dev.toFixed(2)));
+      yc+=rowH;
+    });
+    yc+=10;
+  });
+  p.appendChild(s);
+  p.appendChild(legend([{t:"below mean",c:"var(--div-neg)"},{t:"above mean",c:"var(--div-pos)"},{t:"± standard error",c:"var(--ink-3)"}]));
+  G.appendChild(p);
+})();
+
+/* ---------- 06 Transaction patterns ---------- */
+(function(){
+  const p=panel("06","Transaction patterns","Volume by type (13), outcome share (8), amount histogram (USD) — all near-uniform, no structure.");
+  const wrap=el("div");wrap.style.display="grid";wrap.style.gridTemplateColumns="1.1fr 1fr";wrap.style.gap="20px";
+  if(window.matchMedia("(max-width:760px)").matches)wrap.style.gridTemplateColumns="1fr";
+
+  // by type horizontal bars
+  const s1=svg(440,320);
+  (function(){
+    const W=440,H=320,ml=190,mr=44,mt=8,mb=22;
+    const iw=W-ml-mr, ih=H-mt-mb;
+    const max=4000;
+    const bh=ih/D.byType.length*0.66;
+    D.byType.forEach((t,i)=>{
+      const y0=mt+(ih/D.byType.length)*(i+0.5);
+      s1.appendChild(n("text",{x:ml-8,y:y0+3,"text-anchor":"end",class:"ax",style:"font-size:9.5px"},t[0].length>26?t[0].slice(0,25)+"…":t[0]));
+      s1.appendChild(n("rect",{x:ml,y:y0-bh/2,width:iw*t[1]/max,height:bh,rx:2,fill:cvar("--accent")}));
+      s1.appendChild(n("text",{x:ml+iw*t[1]/max+6,y:y0+3,class:"val",style:"font-size:9px"},t[1].toLocaleString()));
+    });
+    s1.appendChild(n("line",{x1:ml,x2:ml,y1:mt,y2:mt+ih,class:"base"}));
+    s1.appendChild(n("text",{x:ml,y:H-4,class:"axlab"},"transactions per type — spread 3,718 – 3,924 (±3%)"));
+  })();
+  const c1=el("div");c1.appendChild(el("div","p-sub"));c1.lastChild.textContent="Volume by transaction type";c1.appendChild(s1);
+  wrap.appendChild(c1);
+
+  // right column: outcome + histogram stacked
+  const rc=el("div");
+  const s2=svg(420,180);
+  (function(){
+    const W=420,H=180,ml=132,mr=44,mt=6,mb=20;
+    const iw=W-ml-mr, ih=H-mt-mb;
+    const max=15;
+    const bh=ih/D.outcome.length*0.66;
+    [0,5,10,15].forEach(v=>{
+      s2.appendChild(n("line",{x1:ml+(v/max)*iw,x2:ml+(v/max)*iw,y1:mt,y2:mt+ih,class:"gl"}));
+      s2.appendChild(n("text",{x:ml+(v/max)*iw,y:H-mb+13,"text-anchor":"middle",class:"ax"},v+"%"));
+    });
+    D.outcome.forEach((o,i)=>{
+      const y0=mt+(ih/D.outcome.length)*(i+0.5);
+      s2.appendChild(n("text",{x:ml-8,y:y0+3,"text-anchor":"end",class:"ax",style:"font-size:9px"},o[0]));
+      s2.appendChild(n("rect",{x:ml,y:y0-bh/2,width:(o[1]/max)*iw,height:bh,rx:2,fill:cvar("--accent")}));
+      s2.appendChild(n("text",{x:ml+(o[1]/max)*iw+5,y:y0+3,class:"val",style:"font-size:9px"},o[1].toFixed(1)+"%"));
+    });
+    s2.appendChild(n("line",{x1:ml,x2:ml,y1:mt,y2:mt+ih,class:"base"}));
+  })();
+  rc.appendChild(el("div","p-sub"));rc.lastChild.textContent="Outcome share — 8 values, all 12.2–12.6%";rc.appendChild(s2);
+
+  const s3=svg(420,140);
+  (function(){
+    const W=420,H=140,ml=34,mr=10,mt=8,mb=26;
+    const iw=W-ml-mr, ih=H-mt-mb;
+    const max=6000;
+    const bw=iw/D.amtHist.length*0.82;
+    for(let v=0;v<=6000;v+=3000){
+      s3.appendChild(n("line",{x1:ml,x2:ml+iw,y1:mt+ih-(v/max)*ih,y2:mt+ih-(v/max)*ih,class:"gl"}));
+      s3.appendChild(n("text",{x:ml-5,y:mt+ih-(v/max)*ih+3,"text-anchor":"end",class:"ax"},(v/1000)+"k"));
+    }
+    D.amtHist.forEach((c,i)=>{
+      const cx=ml+(iw/D.amtHist.length)*(i+0.5);
+      s3.appendChild(n("rect",{x:cx-bw/2,y:mt+ih-(c/max)*ih,width:bw,height:(c/max)*ih,rx:1.5,fill:cvar("--accent")}));
+    });
+    ["$0","$500","$1000"].forEach((t,i)=>s3.appendChild(n("text",{x:ml+(iw)*i/2,y:H-mb+14,"text-anchor":i===0?"start":i===2?"end":"middle",class:"ax"},t)));
+    s3.appendChild(n("line",{x1:ml,x2:ml+iw,y1:mt+ih,y2:mt+ih,class:"base"}));
+  })();
+  rc.appendChild(el("div","p-sub"));rc.lastChild.textContent="Amount (USD) — ~uniform $0–1000, spec was lognormal (median ≈ $45)";rc.lastChild.style.marginTop="18px";rc.appendChild(s3);
+  wrap.appendChild(rc);
+  p.appendChild(wrap);
+  G.appendChild(p);
+})();
+
+/* ---------- 07 Channel × market heatmap ---------- */
+(function(){
+  const p=panel("07","Channel × market heatmap","Fraud-flag rate by channel type × market — all 20 cells sit in a narrow 48.1–52.7% band.","half");
+  const h=el("div","heat");
+  h.appendChild(el("div"));
+  D.heat.cols.forEach(c=>h.appendChild(el("div","hh",c)));
+  const lo=D.heat.min, hi=D.heat.max;
+  const ramp=["--heat-0","--heat-1","--heat-2","--heat-3","--heat-4","--heat-5"];
+  D.heat.rows.forEach(([name,vals])=>{
+    h.appendChild(el("div","rh",name));
+    vals.forEach(v=>{
+      const t=(v-lo)/(hi-lo);
+      const idx=Math.min(ramp.length-1,Math.floor(t*ramp.length));
+      const cell=el("div","cell");
+      cell.style.background="var("+ramp[idx]+")";
+      if(idx>=4)cell.style.color="var(--heat-hi-ink)";
+      cell.appendChild(el("div","cv",v.toFixed(1)+"%"));
+      h.appendChild(cell);
+    });
+  });
+  p.appendChild(h);
+  const sc=el("div","heatscale");
+  sc.appendChild(el("span",null,"48.1%"));
+  const rp=el("div","ramp");ramp.forEach(r=>{const i=el("i");i.style.background="var("+r+")";rp.appendChild(i);});
+  sc.appendChild(rp);
+  sc.appendChild(el("span",null,"52.7%"));
+  sc.appendChild(el("span",null,"  · spread 4.6 pp across all 20 cells"));
+  p.appendChild(sc);
+  G.appendChild(p);
+})();
+
+/* ---------- 08 Velocity vs fraud ---------- */
+(function(){
+  const p=panel("08","Velocity vs. fraud","Fraud rate by velocity-score decile — flat line, Pearson r = −0.001. No velocity signal.","half");
+  const W=460,H=210,ml=40,mr=16,mt=14,mb=40;
+  const s=svg(W,H);
+  const iw=W-ml-mr, ih=H-mt-mb;
+  const lo=46,hi=54;
+  const y=v=>mt+ih-((v-lo)/(hi-lo))*ih;
+  const x=i=>ml+(iw/9)*i;
+  for(let v=46;v<=54;v+=2){
+    s.appendChild(n("line",{x1:ml,x2:ml+iw,y1:y(v),y2:y(v),class:"gl"}));
+    s.appendChild(n("text",{x:ml-6,y:y(v)+3,"text-anchor":"end",class:"ax"},v+"%"));
+  }
+  s.appendChild(n("line",{x1:ml,x2:ml+iw,y1:y(50.29),y2:y(50.29),stroke:cvar("--spec"),"stroke-width":1,"stroke-dasharray":"4 4"}));
+  s.appendChild(n("text",{x:ml+4,y:y(53.4),"text-anchor":"start",class:"axlab"},"portfolio mean 50.3% (dashed) — decile range 49.0–51.6%"));
+  let dp="";
+  D.velo.dec.forEach((d,i)=>{dp+=(i?"L":"M")+x(i)+" "+y(d[1])+" ";});
+  s.appendChild(n("path",{d:dp,fill:"none",stroke:cvar("--accent"),"stroke-width":2}));
+  D.velo.dec.forEach((d,i)=>{
+    s.appendChild(n("circle",{cx:x(i),cy:y(d[1]),r:3,fill:cvar("--accent")}));
+    s.appendChild(n("text",{x:x(i),y:H-mb+15,"text-anchor":"middle",class:"ax"},"D"+d[0]));
+  });
+  s.appendChild(n("line",{x1:ml,x2:ml+iw,y1:mt+ih,y2:mt+ih,class:"base"}));
+  s.appendChild(n("text",{x:ml,y:H-mb+32,class:"axlab"},"velocity_score deciles (0 → 1000; spec range was 0 – 10)"));
+  p.appendChild(s);
+  p.appendChild(legend([{t:"fraud rate by decile",c:"var(--accent)"},{t:"portfolio mean",c:"var(--spec)"},
+    {t:"r = −0.001 fraud · +0.003 reversed",c:"transparent"}]));
+  G.appendChild(p);
+})();
+
+/* ---------- 09 Recommended next steps ---------- */
+(function(){
+  const p=panel("09","Recommended next steps","Data-quality remediation before any risk analysis is attempted on this dataset.");
+  const ol=el("ol","steps");
+  D.steps.forEach(([h,b])=>{
+    const li=el("li");li.innerHTML="<b>"+h+"</b> "+b;ol.appendChild(li);
+  });
+  p.appendChild(ol);
+  G.appendChild(p);
+})();
+
+/* ============ audio summary ============ */
+(function(){
+  const btn=document.getElementById("audioBtn");
+  const lbl=document.getElementById("audioLbl");
+  if(!("speechSynthesis" in window)){btn.disabled=true;lbl.textContent="Audio not supported";return;}
+  const script=
+    "Wallet Risk one pager. Fifty thousand transactions across four African markets, "+
+    "January 2023 to December 2024, twenty five million dollars in volume. "+
+    "Headline finding: none of the six brief claims reproduce. "+
+    "The three risk flags — fraud flagged, disputed, and reversed — each sample at about fifty percent, "+
+    "against a documented spec of seven, five, and eight percent. That is a coin flip, not weighted sampling. "+
+    "U S S D versus app fraud is one point zero two times, not two point three. "+
+    "Nigeria and Kenya account for fifty percent of fraud volume, not seventy. "+
+    "New accounts under ninety days are one point zero two times, not three. "+
+    "Market traders rank tenth of fifteen on disputes. "+
+    "Velocity score correlation with fraud is r equals minus zero point zero zero one — no relationship. "+
+    "Month end lifts rates by about one percentage point, inside sampling noise. "+
+    "Monthly fraud rate holds a standard deviation of one point two points with no trend or season. "+
+    "Every entity cut — channel, market, K Y C tier, tenure, and all fifteen gig segments — "+
+    "lands within one and a half points of the fifty percent mean. "+
+    "Transaction types, outcomes, and amounts are all near uniform. "+
+    "The channel by market heatmap spans just four point six points across twenty cells. "+
+    "Category domains and numeric ranges have drifted well outside the data dictionary. "+
+    "Recommendation: do not model on this extract until the event generator and distributions are repaired. "+
+    "Full detail for every one of the nine views is on the page, and deeper drill downs are available on request.";
+  let speaking=false;
+  btn.addEventListener("click",()=>{
+    if(speaking){speechSynthesis.cancel();return;}
+    const u=new SpeechSynthesisUtterance(script);
+    u.rate=1.02;u.pitch=1;
+    u.onstart=()=>{speaking=true;lbl.textContent="Stop audio summary";};
+    u.onend=u.onerror=()=>{speaking=false;lbl.textContent="Play audio summary";};
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  });
+  window.addEventListener("beforeunload",()=>speechSynthesis.cancel());
+})();
+</script>
